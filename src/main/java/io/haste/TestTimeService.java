@@ -11,11 +11,11 @@ public class TestTimeService implements TimeService {
     private PriorityQueue<ScheduledFutureWithRunnable> scheduledFutures = new PriorityQueue<>();
     private Clock clock;
 
-    public static TestTimeService withClockOf(Instant instant, ZoneId zoneId) {
+    static TestTimeService withClockOf(Instant instant, ZoneId zoneId) {
         return new TestTimeService(instant, zoneId);
     }
 
-    public static TestTimeService withDefaultClock() {
+    static TestTimeService withDefaultClock() {
         Instant instant = Instant.now();
         ZoneId zoneId = ZoneId.systemDefault();
         return new TestTimeService(instant, zoneId);

@@ -19,7 +19,7 @@ public class TestServiceTime {
         FooAdd runnable = new FooAdd(foo); // add one to object value
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
-        TestTimeService timeService = TestTimeService.withClockOf(instant,zoneId);
+        TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
 
         ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.NANOSECONDS);
         ScheduledFuture schedule2 = timeService.schedule(runnable, 2, TimeUnit.NANOSECONDS);
@@ -40,7 +40,7 @@ public class TestServiceTime {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant,zoneId);
-        TestTimeService timeService = TestTimeService.withClockOf(instant, zoneId);
+        TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
 
         LocalDateTime now = timeService.now();
         
@@ -52,8 +52,8 @@ public class TestServiceTime {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant,zoneId);
-        TestTimeService timeService = TestTimeService.withClockOf(instant, zoneId);
-        
+        TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
+
         timeService.hackIntoFuture(1,TimeUnit.HOURS);
 
         LocalDateTime now = timeService.now();
@@ -79,7 +79,7 @@ public class TestServiceTime {
     public void shouldRunOnceScheduledJob(){
         Foo foo = new Foo();
         FooAdd runnable = new FooAdd(foo);
-        TestTimeService timeService = TestTimeService.withDefaultClock();
+        TestTimeService timeService = TimeService.createTimeServiceForTestsWithCurrentTime();
 
         timeService.schedule(runnable, 1, TimeUnit.SECONDS);
         timeService.hackIntoFuture(4,TimeUnit.SECONDS);
