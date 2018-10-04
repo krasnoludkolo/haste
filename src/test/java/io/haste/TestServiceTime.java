@@ -17,11 +17,10 @@ public class TestServiceTime {
     public void shouldExecuteAllScheduledJobs(){
         Foo foo = new Foo(); // object with int value
         FooAdd runnable = new FooAdd(foo); // add one to object value
-
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
-
         TestTimeService timeService = TestTimeService.withClockOf(instant,zoneId);
+
         ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.NANOSECONDS);
         ScheduledFuture schedule2 = timeService.schedule(runnable, 2, TimeUnit.NANOSECONDS);
         ScheduledFuture schedule3 = timeService.schedule(runnable, 3, TimeUnit.NANOSECONDS);
@@ -67,14 +66,26 @@ public class TestServiceTime {
     public void shouldNotRunCanceledJobs(){
         Foo foo = new Foo();
         FooAdd runnable = new FooAdd(foo);
-
         TestTimeService timeService = TestTimeService.withDefaultClock();
+
         ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.SECONDS);
         schedule1.cancel(true);
         timeService.hackIntoFuture(4,TimeUnit.SECONDS);
 
         assertEquals(0,foo.getA());
+    }
 
+    @Test
+    public void shouldRunOnceScheduledJob(){
+        Foo foo = new Foo();
+        FooAdd runnable = new FooAdd(foo);
+        TestTimeService timeService = TestTimeService.withDefaultClock();
+
+        timeService.schedule(runnable, 1, TimeUnit.SECONDS);
+        timeService.hackIntoFuture(4,TimeUnit.SECONDS);
+        timeService.hackIntoFuture(4,TimeUnit.SECONDS);
+
+        assertEquals(1,foo.getA());
     }
 
 
