@@ -1,2 +1,2 @@
 # haste
-Small library to manage time in java projects.
+A small library for time management in java projects.
