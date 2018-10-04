@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 public interface TimeService {
 
     LocalDateTime now();
-    ScheduledFuture schedule(Runnable runnable, long l, TimeUnit timeUnit);
+    ScheduledFuture schedule(Runnable runnable, long offset, TimeUnit timeUnit);
 
     default TimeService createNormal(){
         return NormalTimeService.withSystemDefaultZone();

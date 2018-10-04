@@ -32,15 +32,15 @@ public class TestTimeService implements TimeService {
     }
 
     @Override
-    public ScheduledFuture schedule(Runnable runnable, long l, TimeUnit timeUnit) {
-        ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(l, timeUnit, runnable);
+    public ScheduledFuture schedule(Runnable runnable, long offset, TimeUnit timeUnit) {
+        ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(offset, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
-    public void hackIntoFuture(long l, TimeUnit timeUnit) {
-        long offset = timeUnit.toNanos(l);
-        clock = Clock.offset(clock, Duration.ofNanos(offset));
+    public void hackIntoFuture(long offset, TimeUnit timeUnit) {
+        long offsetInNano = timeUnit.toNanos(offset);
+        clock = Clock.offset(clock, Duration.ofNanos(offsetInNano));
 
         while (!scheduledFutures.isEmpty() && scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= 0) {
             ScheduledFutureWithRunnable scheduledFuture = scheduledFutures.poll();
@@ -101,7 +101,7 @@ public class TestTimeService implements TimeService {
         }
 
         @Override
-        public Object get(long l, TimeUnit timeUnit) {
+        public Object get(long offset, TimeUnit timeUnit) {
             return new Object();
         }
 
