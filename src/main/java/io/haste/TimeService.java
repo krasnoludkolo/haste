@@ -1,5 +1,6 @@
 package io.haste;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,6 +14,10 @@ public interface TimeService {
 
     static TimeService createNormal(){
         return NormalTimeService.withSystemDefaultZone();
+    }
+
+    static TimeService createNormalWithClock(Clock clock){
+        return NormalTimeService.withClock(clock);
     }
 
     static TestTimeService createTimeServiceForTestsWithCurrentTime(){
