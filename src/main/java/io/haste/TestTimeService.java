@@ -32,8 +32,8 @@ public class TestTimeService implements TimeService {
     }
 
     @Override
-    public ScheduledFuture schedule(Runnable runnable, long offset, TimeUnit timeUnit) {
-        ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(offset, timeUnit, runnable);
+    public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+        ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }

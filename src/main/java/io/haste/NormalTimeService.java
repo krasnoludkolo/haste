@@ -17,10 +17,6 @@ class NormalTimeService implements TimeService {
         return new NormalTimeService(Clock.systemDefaultZone());
     }
 
-    static TimeService withClock(Clock clock){
-        return new NormalTimeService(clock);
-    }
-
     private NormalTimeService(Clock clock) {
         this.clock = clock;
     }
@@ -32,7 +28,7 @@ class NormalTimeService implements TimeService {
     }
 
     @Override
-    public ScheduledFuture schedule(Runnable runnable, long offset, TimeUnit timeUnit) {
-        return executor.schedule(runnable,offset,timeUnit);
+    public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+        return executor.schedule(runnable, delay,timeUnit);
     }
 }
