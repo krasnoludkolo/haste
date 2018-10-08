@@ -88,10 +88,6 @@ public class TestServiceTime {
         assertEquals(1,foo.getA());
     }
 
-
-
-
-
     class Foo {
         private int a = 0;
 
