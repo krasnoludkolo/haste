@@ -13,14 +13,13 @@ class NormalTimeService implements TimeService {
 
     private ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
-    static TimeService withSystemDefaultZone(){
+    static TimeService withSystemDefaultZone() {
         return new NormalTimeService(Clock.systemDefaultZone());
     }
 
     private NormalTimeService(Clock clock) {
         this.clock = clock;
     }
-
 
     @Override
     public LocalDateTime now() {
@@ -29,6 +28,6 @@ class NormalTimeService implements TimeService {
 
     @Override
     public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        return executor.schedule(runnable, delay,timeUnit);
+        return executor.schedule(runnable, delay, timeUnit);
     }
 }

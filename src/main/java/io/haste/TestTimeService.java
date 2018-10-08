@@ -34,8 +34,6 @@ public class TestTimeService implements TimeService {
 
     @Override
     public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-
-
         ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -70,8 +68,8 @@ public class TestTimeService implements TimeService {
 
         @Override
         public long getDelay(TimeUnit timeUnit) {
-            Duration d = Duration.between(LocalDateTime.now(clock),jobTime);
-            return TimeUnit.NANOSECONDS.convert(d.toNanos(),timeUnit);
+            Duration d = Duration.between(LocalDateTime.now(clock), jobTime);
+            return TimeUnit.NANOSECONDS.convert(d.toNanos(), timeUnit);
         }
 
         @Override

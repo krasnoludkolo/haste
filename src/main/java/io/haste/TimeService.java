@@ -9,7 +9,6 @@ import java.util.concurrent.TimeUnit;
 public interface TimeService {
 
     /**
-     *
      * Provides the current date-time from clock given during the creation
      *
      * @return current date-time
@@ -17,11 +16,10 @@ public interface TimeService {
     LocalDateTime now();
 
     /**
-     *
      * Creates and execute action from given runnable that is run with given time delay
      *
      * @param runnable task to execute
-     * @param delay time from now to task execution
+     * @param delay    time from now to task execution
      * @param timeUnit time unit of delay parameter
      * @return {@link ScheduledFuture} representing scheduled task
      */
@@ -31,26 +29,25 @@ public interface TimeService {
     /**
      * @return new instance of {@link io.haste.TimeService} with system clock
      */
-    static TimeService createNormal(){
+    static TimeService createNormal() {
         return NormalTimeService.withSystemDefaultZone();
     }
 
     /**
      * @return new instance of {@link io.haste.TestTimeService} with fixed clock set to current time
      */
-    static TestTimeService createTimeServiceForTestsWithCurrentTime(){
+    static TestTimeService createTimeServiceForTestsWithCurrentTime() {
         return TestTimeService.withDefaultClock();
     }
 
 
     /**
-     *
      * @param instance instance to create clock
-     * @param zoneId zoneId to create clock
+     * @param zoneId   zoneId to create clock
      * @return new instance of {@link io.haste.TestTimeService} with clock from given parameters
      */
-    static TestTimeService createTimeServiceForTests(Instant instance, ZoneId zoneId){
-        return TestTimeService.withClockOf(instance,zoneId);
+    static TestTimeService createTimeServiceForTests(Instant instance, ZoneId zoneId) {
+        return TestTimeService.withClockOf(instance, zoneId);
     }
 
 }
