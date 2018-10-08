@@ -3,12 +3,13 @@ package io.haste;
 import java.time.*;
 import java.util.PriorityQueue;
 import java.util.concurrent.Delayed;
+import java.util.concurrent.RunnableScheduledFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class TestTimeService implements TimeService {
 
-    private PriorityQueue<ScheduledFutureWithRunnable> scheduledFutures = new PriorityQueue<>();
+    private PriorityQueue<RunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
     private Clock clock;
 
     static TestTimeService withClockOf(Instant instant, ZoneId zoneId) {
@@ -33,6 +34,8 @@ public class TestTimeService implements TimeService {
 
     @Override
     public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+
+
         ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -43,7 +46,7 @@ public class TestTimeService implements TimeService {
         clock = Clock.offset(clock, Duration.ofNanos(offsetInNano));
 
         while (!scheduledFutures.isEmpty() && scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= 0) {
-            ScheduledFutureWithRunnable scheduledFuture = scheduledFutures.poll();
+            RunnableScheduledFuture scheduledFuture = scheduledFutures.poll();
             if (!scheduledFuture.isCancelled()) {
                 scheduledFuture.run();
             }
@@ -51,7 +54,7 @@ public class TestTimeService implements TimeService {
     }
 
 
-    private final class ScheduledFutureWithRunnable implements ScheduledFuture<Object> {
+    private final class ScheduledFutureWithRunnable implements RunnableScheduledFuture<Object> {
 
         private final LocalDateTime jobTime;
         private Runnable runnable;
@@ -105,9 +108,15 @@ public class TestTimeService implements TimeService {
             return new Object();
         }
 
-        void run() {
+        @Override
+        public void run() {
             runnable.run();
             done = true;
+        }
+
+        @Override
+        public boolean isPeriodic() {
+            return false;
         }
     }
 }
