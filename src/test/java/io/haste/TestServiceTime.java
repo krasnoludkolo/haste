@@ -68,9 +68,9 @@ public class TestServiceTime {
         FooAdd runnable = new FooAdd(foo);
         TestTimeService timeService = TestTimeService.withDefaultClock();
 
-        ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.SECONDS);
+        ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.HOURS);
         schedule1.cancel(true);
-        timeService.hackIntoFuture(4,TimeUnit.SECONDS);
+        timeService.hackIntoFuture(4,TimeUnit.HOURS);
 
         assertEquals(0,foo.getA());
     }
