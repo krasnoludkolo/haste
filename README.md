@@ -38,7 +38,7 @@ class Event{
     }
     
     boolean hasAlreadyBegun(){
-        return LocalDateTime.now().isAfter(matchStartDate);
+        return LocalDateTime.now().isAfter(eventTime);
     }
     
 }
