@@ -7,7 +7,7 @@ In few application I was struggling with time aspect during test. It's not hard 
 Here comes idea to create open source library to help writing tests based on the passage of time and also to writing more testable systems.
 ## Features
 
-###TL;DR
+### TL;DR
 <i>Haste</i> provides following `TimeService` interface
 ```java
 public interface TimeService {
