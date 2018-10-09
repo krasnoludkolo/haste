@@ -93,7 +93,7 @@ Here comes
 
 `ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);`
  
- method from `TimeService` provider. In 'production' implementation acts like normal java scheduler but in 'Test' implementation you can (almost) instantly see results of your actions. 
+ method from `TimeService`. In 'production' implementation acts like normal java scheduler but in 'Test' implementation you can (almost) instantly see results of your actions. 
  
  ```java
 class FooTest{
