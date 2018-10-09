@@ -15,7 +15,7 @@ public interface TimeService {
     ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);
 }
 ```
-which has dwo implementation:
+which has two implementations:
 * <i>production</i>: based on system clock and default java `ScheduledExecutorService`
 * <i>test</i>: based on changeable clock and scheduler prepared for making 'time jumping' 
 
