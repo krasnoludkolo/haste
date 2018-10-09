@@ -69,7 +69,7 @@ class Event{
 ```
 So, now you can simply use implementation of TimeService prepared for tests:
 ```java
-class EventTest{
+public class EventTest{
     
     @Test
     public void shouldEventStartsAfterStartDate(){
