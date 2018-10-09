@@ -21,12 +21,12 @@ public class TestServiceTime {
         ZoneId zoneId = ZoneId.systemDefault();
         TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
 
-        ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.NANOSECONDS);
-        ScheduledFuture schedule2 = timeService.schedule(runnable, 2, TimeUnit.NANOSECONDS);
-        ScheduledFuture schedule3 = timeService.schedule(runnable, 3, TimeUnit.NANOSECONDS);
-        ScheduledFuture schedule4 = timeService.schedule(runnable, 5, TimeUnit.NANOSECONDS);
+        ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.SECONDS);
+        ScheduledFuture schedule2 = timeService.schedule(runnable, 2, TimeUnit.SECONDS);
+        ScheduledFuture schedule3 = timeService.schedule(runnable, 3, TimeUnit.SECONDS);
+        ScheduledFuture schedule4 = timeService.schedule(runnable, 5, TimeUnit.SECONDS);
 
-        timeService.hackIntoFuture(4,TimeUnit.NANOSECONDS);
+        timeService.hackIntoFuture(4,TimeUnit.SECONDS);
 
         assertEquals(3,foo.getA());
         assertTrue(schedule1.isDone());
