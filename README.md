@@ -5,13 +5,13 @@ A lightweight library for time management in java applications.
 
 In a few applications I was struggling with time aspect during tests. 
 It's not hard to write some kind of proxy or mocks to provide a proper
-date but it is annoying to write then every time. 
+date but it is annoying to write them every time. 
 Here comes the idea to create an open source library to help write tests
  based on the passage of time and also to help write more testable systems.
 ## Features
 
 ### TL;DR
-<i>Haste</i> provides following `TimeService` interface
+<i>Haste</i> provides the following `TimeService` interface
 ```java
 public interface TimeService {
     LocalDateTime now();
@@ -47,7 +47,7 @@ class Event{
 }
 ```
 
-So, how to test `hasAlreadyBegun()` method? You cannot simply create the object and call the method because it requires future date.
+So, how to test `hasAlreadyBegun()` method? You cannot simply create the object and call method because it requires future date.
  So you need to wait and finally check it which isn't really recommended for fast unit tests.
 You can provide current date as parameter but if your system has many layers it could be messy.
 
@@ -94,7 +94,7 @@ public class EventTest{
 ##### Test scheduled runnable
 Some actions in your system may also plan another actions to be done in thebo future. 
 E.g. when you add a sport fixture you may want to check the result after it has finished
-When using normal java scheduler it is hard to test results of scheduled jobs without eg. mocking. 
+When using normal java scheduler it is hard to test results of scheduled jobs without e.g. mocking. 
 Here comes the
 
 
