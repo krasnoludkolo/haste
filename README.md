@@ -3,8 +3,11 @@ A lightweight library for time management in java applications.
 
 ## Goals and motivation
 
-In few application I was struggling with time aspect during test. It's not hard to write some kind of proxy or mocks to provide properly date but is annoying to write then every time. 
-Here comes idea to create open source library to help writing tests based on the passage of time and also to writing more testable systems.
+In a few applications I was struggling with time aspect during tests. 
+It's not hard to write some kind of proxy or mocks to provide a proper
+date but it is annoying to write then every time. 
+Here comes the idea to create an open source library to help write tests
+ based on the passage of time and also to help write more testable systems.
 ## Features
 
 ### TL;DR
@@ -19,13 +22,13 @@ which has two implementations:
 * <i>production</i>: based on system clock and default java `ScheduledExecutorService`
 * <i>test</i>: based on changeable clock and scheduler prepared for making 'time jumping' 
 
-It gives more control over time during tests. 
+It gives you more control over time during tests. 
 
 ### Full version
 
 ##### Time providing
 
-Consider simple class:
+Consider a simple class:
 ```java
 class Event{
     private LocalDateTime eventTime;
@@ -44,10 +47,12 @@ class Event{
 }
 ```
 
-So, how to test `hasAlreadyBegun()` method? You cannot simply create the object and call method because it requires future date. So you need to wait and finally check it which isn't really recommended for fast unit tests.
+So, how to test `hasAlreadyBegun()` method? You cannot simply create the object and call the method because it requires future date.
+ So you need to wait and finally check it which isn't really recommended for fast unit tests.
 You can provide current date as parameter but if your system has many layers it could be messy.
 
-Instead of it you can treat time as external dependency. Let's modify the above class
+Instead you can treat time as external dependency. 
+Let's modify the above class:
 ```java
 class Event{
     private LocalDateTime eventTime;
@@ -67,7 +72,7 @@ class Event{
     
 }
 ```
-So, now you can simply use implementation of TimeService prepared for tests:
+So, now you can simply use the implementation of TimeService prepared for tests:
 ```java
 public class EventTest{
     
@@ -87,13 +92,16 @@ public class EventTest{
 
 
 ##### Test scheduled runnable
-Some actions in your system may also plan some actions to be done in future. Eg. adding sport fixture you may want to check the result after it has finished
-Using normal java scheduler is hard to test results of scheduler jobs without eg. mocking. 
-Here comes 
+Some actions in your system may also plan another actions to be done in thebo future. 
+E.g. when you add a sport fixture you may want to check the result after it has finished
+When using normal java scheduler it is hard to test results of scheduled jobs without eg. mocking. 
+Here comes the
+
 
 `ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);`
  
- method from `TimeService`. In 'production' implementation acts like normal java scheduler but in 'Test' implementation you can (almost) instantly see results of your actions. 
+ method from `TimeService`. In 'production' implementation it acts like a normal java scheduler but in 'Test' 
+ implementation you can (almost) instantly see the results of your actions. 
  
  ```java
 class FooTest{
@@ -124,4 +132,4 @@ class FooTest{
 ```
 
 ## Disclaimer
-Keep in mind that Haste in early-alpha phase which means that some API details may change between versions.
+Keep in mind that Haste is in early-alpha phase which means that some API details may change between versions.
