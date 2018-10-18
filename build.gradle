@@ -1,7 +1,11 @@
-group 'io.haste'
-version '0.0.1-SNAPSHOT'
+group 'io.github.krasnoludkolo'
+version '0.0.1'
 
 apply plugin: 'java'
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
 
 sourceCompatibility = 1.8
 
@@ -11,4 +15,70 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives jar
+
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'haste'
+                packaging 'jar'
+                description 'A lightweight library for time management in java applications.'
+                url 'https://github.com/krasnoludkolo/haste'
+
+                inceptionYear '2018'
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                
+                scm {
+                    url 'scm:git@github.com:krasnoludkolo/haste.git'
+                    connection 'scm:git@github.com:krasnoludkolo/haste.git'
+                    developerConnection 'scm:git@github.com:krasnoludkolo/haste.git'
+                }
+
+                developers {
+                    developer {
+                        name 'Jan Danecki'
+                        email 'janek@projmen.pl'
+                    }
+                }
+            }
+        }
+    }
 }
