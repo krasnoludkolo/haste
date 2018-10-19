@@ -8,6 +8,21 @@ It's not hard to write some kind of proxy or mocks to provide a proper
 date but it is annoying to write them every time. 
 Here comes the idea to create an open source library to help write tests
  based on the passage of time and also to help write more testable systems.
+
+## Usage
+
+```xml
+<dependency>
+    <groupId>io.github.krasnoludkolo</groupId>
+    <artifactId>haste</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+```groovy
+compile 'io.github.krasnoludkolo:haste:0.0.1'
+```
+
+
 ## Features
 
 ### TL;DR
