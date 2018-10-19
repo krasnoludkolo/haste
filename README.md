@@ -134,7 +134,7 @@ class FooTest{
         ScheduledFuture schedule3 = timeService.schedule(runnable, 3, TimeUnit.HOURS);
         ScheduledFuture schedule4 = timeService.schedule(runnable, 5, TimeUnit.HOURS);
 
-        timeService.hackIntoFuture(4,TimeUnit.HOURS);
+        timeService.hackIntoFuture(4,TimeUnit.HOURS); //Probably temporally method name ;)
 
         assertEquals(3,foo.getA());
         assertTrue(schedule1.isDone());
