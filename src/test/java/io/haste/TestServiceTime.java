@@ -15,8 +15,8 @@ public class TestServiceTime {
 
     @Test
     public void shouldExecuteAllScheduledJobs(){
-        Foo foo = new Foo(); // object with int value
-        FooAdd runnable = new FooAdd(foo); // add one to object value
+        ObjectWithInteger objectWithInteger = new ObjectWithInteger(); // object with int value
+        AddRunnable runnable = new AddRunnable(objectWithInteger); // add one to object value
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
@@ -28,7 +28,7 @@ public class TestServiceTime {
 
         timeService.hackIntoFuture(4,TimeUnit.SECONDS);
 
-        assertEquals(3,foo.getA());
+        assertEquals(3, objectWithInteger.getA());
         assertTrue(schedule1.isDone());
         assertTrue(schedule2.isDone());
         assertTrue(schedule3.isDone());
@@ -64,31 +64,46 @@ public class TestServiceTime {
 
     @Test
     public void shouldNotRunCanceledJobs(){
-        Foo foo = new Foo();
-        FooAdd runnable = new FooAdd(foo);
+        ObjectWithInteger objectWithInteger = new ObjectWithInteger();
+        AddRunnable runnable = new AddRunnable(objectWithInteger);
         TestTimeService timeService = TestTimeService.withDefaultClock();
 
         ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.HOURS);
         schedule1.cancel(true);
         timeService.hackIntoFuture(4,TimeUnit.HOURS);
 
-        assertEquals(0,foo.getA());
+        assertEquals(0, objectWithInteger.getA());
     }
 
     @Test
     public void shouldRunOnceScheduledJob(){
-        Foo foo = new Foo();
-        FooAdd runnable = new FooAdd(foo);
+        ObjectWithInteger objectWithInteger = new ObjectWithInteger();
+        AddRunnable runnable = new AddRunnable(objectWithInteger);
         TestTimeService timeService = TimeService.createTimeServiceForTestsWithCurrentTime();
 
         timeService.schedule(runnable, 1, TimeUnit.SECONDS);
         timeService.hackIntoFuture(4,TimeUnit.SECONDS);
         timeService.hackIntoFuture(4,TimeUnit.SECONDS);
 
-        assertEquals(1,foo.getA());
+        assertEquals(1, objectWithInteger.getA());
     }
 
-    class Foo {
+    @Test
+    public void shouldChangeInternalClockToEveryScheduledJobTime() {
+        TestTimeService timeService = TimeService.createTimeServiceForTestsWithCurrentTime();
+        ObjectWithData object = new ObjectWithData(timeService.now().plusHours(3));
+        IsAfterRunnable runnable = new IsAfterRunnable(timeService, object);
+
+        timeService.schedule(() -> {
+        }, 1, TimeUnit.HOURS);
+        timeService.schedule(runnable, 2, TimeUnit.HOURS);
+
+        timeService.hackIntoFuture(3, TimeUnit.HOURS);
+
+        assertTrue(object.isAfter);
+    }
+
+    class ObjectWithInteger {
         private int a = 0;
 
         void add() {
@@ -100,17 +115,45 @@ public class TestServiceTime {
         }
     }
 
-    class FooAdd implements Runnable {
+    class AddRunnable implements Runnable {
 
-        private Foo foo;
+        private ObjectWithInteger objectWithInteger;
 
-        FooAdd(Foo foo) {
-            this.foo = foo;
+        AddRunnable(ObjectWithInteger objectWithInteger) {
+            this.objectWithInteger = objectWithInteger;
         }
 
         @Override
         public void run() {
-            foo.add();
+            objectWithInteger.add();
         }
     }
+
+    class ObjectWithData {
+        private LocalDateTime localDateTime;
+        private boolean isAfter;
+
+        ObjectWithData(LocalDateTime localDateTime) {
+            this.localDateTime = localDateTime;
+        }
+    }
+
+    class IsAfterRunnable implements Runnable {
+
+        private TimeService timeService;
+        private ObjectWithData object;
+
+        IsAfterRunnable(TimeService timeService, ObjectWithData object) {
+            this.timeService = timeService;
+            this.object = object;
+        }
+
+        @Override
+        public void run() {
+            if (object.localDateTime.isAfter(timeService.now())) {
+                object.isAfter = true;
+            }
+        }
+    }
+
 }

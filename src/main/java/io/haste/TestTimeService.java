@@ -26,7 +26,6 @@ public class TestTimeService implements TimeService {
         clock = Clock.fixed(instant, zoneId);
     }
 
-
     @Override
     public LocalDateTime now() {
         return LocalDateTime.now(clock);
@@ -40,15 +39,31 @@ public class TestTimeService implements TimeService {
     }
 
     public void hackIntoFuture(long offset, TimeUnit timeUnit) {
-        long offsetInNano = timeUnit.toNanos(offset);
-        clock = Clock.offset(clock, Duration.ofNanos(offsetInNano));
+        long remainingOffsetInNano = timeUnit.toNanos(offset);
 
-        while (!scheduledFutures.isEmpty() && scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= 0) {
-            RunnableScheduledFuture scheduledFuture = scheduledFutures.poll();
-            if (!scheduledFuture.isCancelled()) {
-                scheduledFuture.run();
-            }
+        while (!scheduledFutures.isEmpty() && nextJobIsInRange(remainingOffsetInNano)) {
+            RunnableScheduledFuture job = scheduledFutures.poll();
+            long delay = job.getDelay(TimeUnit.NANOSECONDS);
+            updateClock(delay);
+            remainingOffsetInNano -= delay;
+            runJob(job);
         }
+
+        updateClock(remainingOffsetInNano);
+    }
+
+    private boolean nextJobIsInRange(long remainingOffsetInNano) {
+        return scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= remainingOffsetInNano;
+    }
+
+    private void runJob(RunnableScheduledFuture job) {
+        if (!job.isCancelled()) {
+            job.run();
+        }
+    }
+
+    private void updateClock(long delay) {
+        clock = Clock.offset(clock, Duration.ofNanos(delay));
     }
 
 
