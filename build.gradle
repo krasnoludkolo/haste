@@ -39,17 +39,15 @@ signing {
 }
 
 uploadArchives {
-    ossrhUsername = project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv('ossrhUsername')
-    ossrhPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv('ossrhPassword')
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv('ossrhUsername'), password: project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv('ossrhPassword'))
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv('ossrhUsername'), password: project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv('ossrhPassword'))
             }
 
             pom.project {
@@ -66,7 +64,7 @@ uploadArchives {
                         url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
-                
+
                 scm {
                     url 'scm:git@github.com:krasnoludkolo/haste.git'
                     connection 'scm:git@github.com:krasnoludkolo/haste.git'
