@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste/badge.png)](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste)
+
 # haste
 A lightweight library for time management in java applications.
 
