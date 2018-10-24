@@ -1,5 +1,6 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste/badge.png)](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste)
 [![Build Status](https://travis-ci.org/krasnoludkolo/haste.svg?branch=master)](https://travis-ci.org/krasnoludkolo/haste)
+[![codecov](https://codecov.io/gh/krasnoludkolo/haste/branch/master/graph/badge.svg)](https://codecov.io/gh/krasnoludkolo/haste)
 
 # haste
 A lightweight library for time management in java applications.
