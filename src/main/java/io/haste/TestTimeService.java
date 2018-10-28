@@ -2,14 +2,16 @@ package io.haste;
 
 import java.time.*;
 import java.util.PriorityQueue;
-import java.util.concurrent.Delayed;
-import java.util.concurrent.RunnableScheduledFuture;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TestTimeService implements TimeService {
 
-    private PriorityQueue<RunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
+    private static final Logger LOGGER = Logger.getLogger(TestTimeService.class.getName());
+
+
+    private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
     private Clock clock;
 
     static TestTimeService withClockOf(Instant instant, ZoneId zoneId) {
@@ -38,27 +40,34 @@ public class TestTimeService implements TimeService {
         return scheduledFuture;
     }
 
+    @Override
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
+        ScheduledFutureWithCallable<V> scheduledFuture = new ScheduledFutureWithCallable<>(delay, timeUnit, callable);
+        scheduledFutures.add(scheduledFuture);
+        return scheduledFuture;
+    }
+
     public void hackIntoFuture(long offset, TimeUnit timeUnit) {
         long remainingOffsetInNano = timeUnit.toNanos(offset);
 
-        while (!scheduledFutures.isEmpty() && nextJobIsInRange(remainingOffsetInNano)) {
-            RunnableScheduledFuture job = scheduledFutures.poll();
-            long delay = job.getDelay(TimeUnit.NANOSECONDS);
+        while (!scheduledFutures.isEmpty() && nextTaskIsInRange(remainingOffsetInNano)) {
+            RunnableScheduledFuture task = scheduledFutures.poll();
+            long delay = task.getDelay(TimeUnit.NANOSECONDS);
             updateClock(delay);
             remainingOffsetInNano -= delay;
-            runJob(job);
+            runTask(task);
         }
 
         updateClock(remainingOffsetInNano);
     }
 
-    private boolean nextJobIsInRange(long remainingOffsetInNano) {
+    private boolean nextTaskIsInRange(long remainingOffsetInNano) {
         return scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= remainingOffsetInNano;
     }
 
-    private void runJob(RunnableScheduledFuture job) {
-        if (!job.isCancelled()) {
-            job.run();
+    private void runTask(RunnableScheduledFuture task) {
+        if (!task.isCancelled()) {
+            task.run();
         }
     }
 
@@ -67,23 +76,21 @@ public class TestTimeService implements TimeService {
     }
 
 
-    private final class ScheduledFutureWithRunnable implements RunnableScheduledFuture<Object> {
+    private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
 
-        private final LocalDateTime jobTime;
-        private Runnable runnable;
-        private boolean canceled;
-        private boolean done;
+        final LocalDateTime taskTime;
+        boolean canceled;
+        boolean done;
 
-        private ScheduledFutureWithRunnable(long delay, TimeUnit timeUnit, Runnable runnable) {
-            jobTime = LocalDateTime.now(clock).plusNanos(timeUnit.toNanos(delay));
+        private AbstractRunnableScheduledFuture(long delay, TimeUnit timeUnit) {
+            taskTime = LocalDateTime.now(clock).plusNanos(timeUnit.toNanos(delay));
             this.canceled = false;
             this.done = false;
-            this.runnable = runnable;
         }
 
         @Override
         public long getDelay(TimeUnit timeUnit) {
-            Duration d = Duration.between(LocalDateTime.now(clock), jobTime);
+            Duration d = Duration.between(LocalDateTime.now(clock), taskTime);
             return TimeUnit.NANOSECONDS.convert(d.toNanos(), timeUnit);
         }
 
@@ -112,6 +119,21 @@ public class TestTimeService implements TimeService {
         }
 
         @Override
+        public boolean isPeriodic() {
+            return false;
+        }
+    }
+
+    private class ScheduledFutureWithRunnable extends AbstractRunnableScheduledFuture<Object> {
+
+        private Runnable runnable;
+
+        private ScheduledFutureWithRunnable(long delay, TimeUnit timeUnit, Runnable runnable) {
+            super(delay, timeUnit);
+            this.runnable = runnable;
+        }
+
+        @Override
         public Object get() {
             return new Object();
         }
@@ -126,11 +148,38 @@ public class TestTimeService implements TimeService {
             runnable.run();
             done = true;
         }
+    }
+
+    private class ScheduledFutureWithCallable<V> extends AbstractRunnableScheduledFuture<V> {
+
+        private Callable<V> callable;
+        private V value;
+
+        private ScheduledFutureWithCallable(long delay, TimeUnit timeUnit, Callable<V> callable) {
+            super(delay, timeUnit);
+            this.callable = callable;
+        }
 
         @Override
-        public boolean isPeriodic() {
-            return false;
+        public V get() {
+            return value;
+        }
+
+        @Override
+        public V get(long offset, TimeUnit timeUnit) {
+            return value;
+        }
+
+        @Override
+        public void run() {
+            try {
+                value = callable.call();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e::getMessage);
+            }
+            done = true;
         }
     }
+
 }
 

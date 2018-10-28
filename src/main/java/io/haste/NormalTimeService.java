@@ -2,10 +2,7 @@ package io.haste;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 class NormalTimeService implements TimeService {
 
@@ -30,4 +27,10 @@ class NormalTimeService implements TimeService {
     public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
         return executor.schedule(runnable, delay, timeUnit);
     }
+
+    @Override
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
+        return executor.schedule(callable, delay, timeUnit);
+    }
+
 }
