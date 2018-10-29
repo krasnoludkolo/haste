@@ -3,6 +3,7 @@ package io.haste;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +17,7 @@ public interface TimeService {
     LocalDateTime now();
 
     /**
-     * Creates and execute action from given runnable that is run with given time delay
+     * Creates and execute task from given runnable that is run with given time delay
      *
      * @param runnable task to execute
      * @param delay    time from now to task execution
@@ -24,6 +25,16 @@ public interface TimeService {
      * @return {@link ScheduledFuture} representing scheduled task
      */
     ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);
+
+    /**
+     * Creates and execute task from given callable that is run with given time delay
+     *
+     * @param callable task to execute
+     * @param delay    time from now to task execution
+     * @param timeUnit time unit of delay parameter
+     * @return {@link ScheduledFuture} representing scheduled task
+     */
+    <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit);
 
 
     /**
