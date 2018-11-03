@@ -1,13 +1,12 @@
 package io.haste.event;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.haste.TestTimeService;
 import io.haste.TimeService;
-import org.junit.Test;
-
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 public class EventTest{
 

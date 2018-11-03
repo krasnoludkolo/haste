@@ -1,6 +1,10 @@
 package io.haste;
 
-import org.junit.Test;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -9,8 +13,8 @@ import java.time.ZoneId;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
 
 public class TestServiceTime {
 
