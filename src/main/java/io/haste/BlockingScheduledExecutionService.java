@@ -1,40 +1,34 @@
 package io.haste;
 
-import java.time.*;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TestTimeService implements TimeService {
+public final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorService, TimeSource {
 
-    private static final Logger LOGGER = Logger.getLogger(TestTimeService.class.getName());
-
-
+    private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
     private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
+
     private Clock clock;
 
-    static TestTimeService withClockOf(Instant instant, ZoneId zoneId) {
-        return new TestTimeService(instant, zoneId);
+    public static BlockingScheduledExecutionService withFixedClockFromNow() {
+        return new BlockingScheduledExecutionService(Clock.systemDefaultZone());
     }
 
-    static TestTimeService withDefaultClock() {
-        Instant instant = Instant.now();
-        ZoneId zoneId = ZoneId.systemDefault();
-        return new TestTimeService(instant, zoneId);
+    public static BlockingScheduledExecutionService withFixedClock(Clock clock) {
+        return new BlockingScheduledExecutionService(clock);
     }
 
-    private TestTimeService(Instant instant, ZoneId zoneId) {
-        clock = Clock.fixed(instant, zoneId);
-    }
-
-    @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    private BlockingScheduledExecutionService(Clock clock) {
+        this.clock = Clock.fixed(clock.instant(), clock.getZone());
     }
 
     @Override
-    public ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+    public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
         ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -47,8 +41,25 @@ public class TestTimeService implements TimeService {
         return scheduledFuture;
     }
 
-    public void hackIntoFuture(long offset, TimeUnit timeUnit) {
-        long remainingOffsetInNano = timeUnit.toNanos(offset);
+    @Override
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
+        PeriodicScheduledFutureWithRunnable scheduledFuture = new PeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
+        scheduledFutures.add(scheduledFuture);
+        return scheduledFuture;
+    }
+
+    @Override
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
+        return null;
+    }
+
+    @Override
+    public LocalDateTime now() {
+        return LocalDateTime.now(clock);
+    }
+
+    public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
+        long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
         while (!scheduledFutures.isEmpty() && nextTaskIsInRange(remainingOffsetInNano)) {
             RunnableScheduledFuture task = scheduledFutures.poll();
@@ -57,7 +68,6 @@ public class TestTimeService implements TimeService {
             remainingOffsetInNano -= delay;
             runTask(task);
         }
-
         updateClock(remainingOffsetInNano);
     }
 
@@ -75,22 +85,23 @@ public class TestTimeService implements TimeService {
         clock = Clock.offset(clock, Duration.ofNanos(delay));
     }
 
-
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
 
-        final LocalDateTime taskTime;
+        final LocalDateTime scheduledTime;
+        final long delayInNanos;
         boolean canceled;
         boolean done;
 
         private AbstractRunnableScheduledFuture(long delay, TimeUnit timeUnit) {
-            taskTime = LocalDateTime.now(clock).plusNanos(timeUnit.toNanos(delay));
+            scheduledTime = LocalDateTime.now(clock);
+            delayInNanos = timeUnit.toNanos(delay);
             this.canceled = false;
             this.done = false;
         }
 
         @Override
         public long getDelay(TimeUnit timeUnit) {
-            Duration d = Duration.between(LocalDateTime.now(clock), taskTime);
+            Duration d = Duration.between(LocalDateTime.now(clock), scheduledTime.plusNanos(delayInNanos));
             return TimeUnit.NANOSECONDS.convert(d.toNanos(), timeUnit);
         }
 
@@ -126,7 +137,7 @@ public class TestTimeService implements TimeService {
 
     private class ScheduledFutureWithRunnable extends AbstractRunnableScheduledFuture<Object> {
 
-        private Runnable runnable;
+        Runnable runnable;
 
         private ScheduledFutureWithRunnable(long delay, TimeUnit timeUnit, Runnable runnable) {
             super(delay, timeUnit);
@@ -152,8 +163,8 @@ public class TestTimeService implements TimeService {
 
     private class ScheduledFutureWithCallable<V> extends AbstractRunnableScheduledFuture<V> {
 
-        private Callable<V> callable;
-        private V value;
+        Callable<V> callable;
+        V value;
 
         private ScheduledFutureWithCallable(long delay, TimeUnit timeUnit, Callable<V> callable) {
             super(delay, timeUnit);
@@ -181,5 +192,27 @@ public class TestTimeService implements TimeService {
         }
     }
 
-}
+    class PeriodicScheduledFutureWithRunnable extends ScheduledFutureWithRunnable {
 
+        long periodic;
+        TimeUnit periodicTimeUnit;
+
+        private PeriodicScheduledFutureWithRunnable(Runnable runnable, long delay, TimeUnit timeUnit, long periodic) {
+            super(delay, timeUnit, runnable);
+            this.periodic = periodic;
+            this.periodicTimeUnit = timeUnit;
+        }
+
+        @Override
+        public void run() {
+            scheduleAtFixedRate(this.runnable, periodic, periodic, periodicTimeUnit);
+            super.run();
+        }
+
+        @Override
+        public boolean isPeriodic() {
+            return true;
+        }
+    }
+
+}
