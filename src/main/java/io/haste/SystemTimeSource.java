@@ -7,9 +7,6 @@ final class SystemTimeSource implements TimeSource {
 
     private Clock clock = Clock.systemDefaultZone();
 
-    SystemTimeSource() {
-    }
-
     @Override
     public LocalDateTime now() {
         return LocalDateTime.now(clock);
