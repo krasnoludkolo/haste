@@ -15,10 +15,17 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
 
     private Clock clock;
 
+    /**
+     * @return instance with fixed clock with current time
+     */
     public static BlockingScheduledExecutionService withFixedClockFromNow() {
         return new BlockingScheduledExecutionService(Clock.systemDefaultZone());
     }
 
+    /**
+     * @param clock source of 'now'.
+     * @return instance with fixed clock from given clock
+     */
     public static BlockingScheduledExecutionService withFixedClock(Clock clock) {
         return new BlockingScheduledExecutionService(clock);
     }
@@ -60,6 +67,12 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         return LocalDateTime.now(clock);
     }
 
+    /**
+     * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
+     *
+     * @param delayTime amount of time to move
+     * @param timeUnit  time unit of delay parameter
+     */
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
         long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
