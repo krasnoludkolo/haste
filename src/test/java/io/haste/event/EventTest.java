@@ -1,23 +1,23 @@
 package io.haste.event;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import io.haste.TestTimeService;
-import io.haste.TimeService;
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
+import io.haste.BlockingScheduledExecutionService;
 import org.junit.jupiter.api.Test;
 
-public class EventTest{
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class EventTest {
 
     @Test
-    public void shouldEventStartsAfterStartDate(){
+    void shouldEventStartsAfterStartDate() {
         //given
-        TestTimeService timeService = TimeService.createTimeServiceForTestsWithCurrentTime();
+        BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
         LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
-        Event event = new Event(eventTime,timeService);
+        Event event = new Event(eventTime, service);
         //when
-        timeService.hackIntoFuture(2, TimeUnit.HOURS); //Probably temporally method name ;)
+        service.advanceTimeBy(2, TimeUnit.HOURS);
         //then
         assertTrue(event.hasAlreadyBegun());
     }
