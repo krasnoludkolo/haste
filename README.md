@@ -35,7 +35,7 @@ with ```advanceTimeBy``` method to simulate lapse of time.
 
 ### Full version
 
-##### Test scheduled runnable
+##### Test scheduled tasks
 Some actions in your system may also plan another actions to be done in the future. 
 E.g. when you add a sport fixture you may want to check the result after it has finished
 When using normal java scheduler it is hard to test results of scheduled jobs without e.g. mocking. 
@@ -70,5 +70,53 @@ class FooTest{
 }
 ```
 
+##### Get access to current time
+With <i>Haste</i> comes the fallowing interface 
+```java
+public interface TimeSource {
+    LocalDateTime now();
+}
+```
+```BlockingScheduledExecutionService``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
+time like in example
+
+```java
+
+class Event{
+
+    private LocalDateTime eventTime;
+    private TimeSource timeSource;
+
+    Event(LocalDateTime eventTime, TimeSource timeSource) {
+        if (timeSource.now().isAfter(eventTime)) {
+            throw new IllegalArgumentException("Cannot make event in past");
+        }
+        this.eventTime = eventTime;
+        this.timeSource = timeSource;
+    }
+
+    boolean hasAlreadyBegun(){
+        return timeSource.now().isAfter(eventTime);
+    }
+
+}
+```
+```java
+
+class EventTest {
+
+    @Test
+    void shouldEventStartsAfterStartDate() {
+        //given
+        BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
+        LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
+        Event event = new Event(eventTime, service);
+        //when
+        service.advanceTimeBy(2, TimeUnit.HOURS);
+        //then
+        assertTrue(event.hasAlreadyBegun());
+    }
+}
+```
 ## Disclaimer
 Keep in mind that Haste is in early-alpha phase which means that some API details may change between versions.
