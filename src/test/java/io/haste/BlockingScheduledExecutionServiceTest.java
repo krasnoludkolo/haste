@@ -136,6 +136,18 @@ class BlockingScheduledExecutionServiceTest {
         assertEquals(4, objectWithInteger.getA());
     }
 
+    @Test
+    void shouldPeriodicallyRunPeriodicTaskWithFixedDelay() {
+        ObjectWithInteger objectWithInteger = new ObjectWithInteger();
+        AddRunnable runnable = new AddRunnable(objectWithInteger);
+        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+
+        executorService.scheduleWithFixedDelay(runnable, 1, 3, TimeUnit.NANOSECONDS);
+        executorService.advanceTimeBy(11, TimeUnit.NANOSECONDS);
+
+        assertEquals(4, objectWithInteger.getA());
+    }
+
     class ObjectWithInteger {
         private int a = 0;
 

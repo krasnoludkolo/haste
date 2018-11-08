@@ -29,28 +29,30 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
 
     @Override
     public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        ScheduledFutureWithRunnable scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
+        AbstractRunnableScheduledFuture scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
-        ScheduledFutureWithCallable<V> scheduledFuture = new ScheduledFutureWithCallable<>(delay, timeUnit, callable);
+        AbstractRunnableScheduledFuture<V> scheduledFuture = new ScheduledFutureWithCallable<>(delay, timeUnit, callable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
-        PeriodicScheduledFutureWithRunnable scheduledFuture = new PeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
+        AbstractRunnableScheduledFuture scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
-        return null;
+        AbstractRunnableScheduledFuture scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
+        scheduledFutures.add(scheduledFuture);
+        return scheduledFuture;
     }
 
     @Override
@@ -192,7 +194,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         }
     }
 
-    class PeriodicScheduledFutureWithRunnable extends ScheduledFutureWithRunnable {
+    private abstract class PeriodicScheduledFutureWithRunnable extends ScheduledFutureWithRunnable {
 
         long periodic;
         TimeUnit periodicTimeUnit;
@@ -204,15 +206,36 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         }
 
         @Override
+        public boolean isPeriodic() {
+            return true;
+        }
+
+    }
+
+    private class FixedRatePeriodicScheduledFutureWithRunnable extends PeriodicScheduledFutureWithRunnable {
+
+
+        private FixedRatePeriodicScheduledFutureWithRunnable(Runnable runnable, long delay, TimeUnit timeUnit, long periodic) {
+            super(runnable, delay, timeUnit, periodic);
+        }
+
+        @Override
         public void run() {
             scheduleAtFixedRate(this.runnable, periodic, periodic, periodicTimeUnit);
             super.run();
         }
-
-        @Override
-        public boolean isPeriodic() {
-            return true;
-        }
     }
 
+    private class FixedDelayPeriodicScheduledFutureWithRunnable extends PeriodicScheduledFutureWithRunnable {
+
+        private FixedDelayPeriodicScheduledFutureWithRunnable(Runnable runnable, long delay, TimeUnit timeUnit, long periodic) {
+            super(runnable, delay, timeUnit, periodic);
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            scheduleWithFixedDelay(this.runnable, periodic, periodic, periodicTimeUnit);
+        }
+    }
 }
