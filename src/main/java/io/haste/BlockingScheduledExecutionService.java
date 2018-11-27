@@ -15,22 +15,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
 
     private Clock clock;
 
-    /**
-     * @return instance with fixed clock with current time
-     */
-    public static BlockingScheduledExecutionService withFixedClockFromNow() {
-        return new BlockingScheduledExecutionService(Clock.systemDefaultZone());
-    }
-
-    /**
-     * @param clock source of 'now'.
-     * @return instance with fixed clock from given clock
-     */
-    public static BlockingScheduledExecutionService withFixedClock(Clock clock) {
-        return new BlockingScheduledExecutionService(clock);
-    }
-
-    private BlockingScheduledExecutionService(Clock clock) {
+    BlockingScheduledExecutionService(Clock clock) {
         this.clock = Clock.fixed(clock.instant(), clock.getZone());
     }
 

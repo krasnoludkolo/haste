@@ -23,7 +23,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldExecuteAllScheduledJobs() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
 
         ScheduledFuture<Integer> schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
         ScheduledFuture schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
@@ -44,7 +44,7 @@ class BlockingScheduledExecutionServiceTest {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClock(clock);
+        BlockingScheduledExecutionService executorService = Haste.withFixedClock(clock);
 
         executorService.advanceTimeBy(1, TimeUnit.HOURS);
 
@@ -56,7 +56,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldNotRunCanceledJobs() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
 
         ScheduledFuture schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
         schedule1.cancel(true);
@@ -69,7 +69,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldRunOnceScheduledJob() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
 
         executorService.schedule(runnable, 1, TimeUnit.SECONDS);
         executorService.advanceTimeBy(4, TimeUnit.SECONDS);
@@ -80,7 +80,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldChangeInternalClockToEveryScheduledJobTime() {
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
         ObjectWithData object = new ObjectWithData(executorService.now().plusHours(3));
         IsAfterRunnable runnable = new IsAfterRunnable(executorService, object);
 
@@ -94,7 +94,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldGetValueFromScheduledCallable() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
         ScheduledFuture<Integer> schedule = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
 
         executorService.advanceTimeBy(2, TimeUnit.HOURS);
@@ -104,7 +104,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldScheduledFutureBeDoneAfterExecuteCallable() {
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
         ScheduledFuture<Integer> schedule = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
 
         executorService.advanceTimeBy(2, TimeUnit.HOURS);
@@ -116,7 +116,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldRunPeriodicTaskWithDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        BlockingScheduledExecutionService executorService = Haste.withFixedClockFromNow();
 
         executorService.scheduleAtFixedRate(runnable, 1, 3, TimeUnit.SECONDS);
         executorService.advanceTimeBy(2, TimeUnit.SECONDS);
@@ -128,7 +128,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldPeriodicallyRunPeriodicTaskWithDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+        BlockingScheduledExecutionService executorService = Haste.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
 
         executorService.scheduleAtFixedRate(runnable, 1, 3, TimeUnit.NANOSECONDS);
         executorService.advanceTimeBy(11, TimeUnit.NANOSECONDS);
@@ -140,7 +140,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldPeriodicallyRunPeriodicTaskWithFixedDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+        BlockingScheduledExecutionService executorService = Haste.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
 
         executorService.scheduleWithFixedDelay(runnable, 1, 3, TimeUnit.NANOSECONDS);
         executorService.advanceTimeBy(11, TimeUnit.NANOSECONDS);
