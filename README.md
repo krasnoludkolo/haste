@@ -139,13 +139,12 @@ class EventTest {
 
     @Test
     void shouldEventStartsAfterStartDate() {
-        //given
         BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
         LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
         Event event = new Event(eventTime, service);
-        //when
+        
         service.advanceTimeBy(2, TimeUnit.HOURS);
-        //then
+        
         assertTrue(event.hasAlreadyBegun());
     }
 }
