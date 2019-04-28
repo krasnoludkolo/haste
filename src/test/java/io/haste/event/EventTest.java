@@ -14,7 +14,7 @@ class EventTest {
     @Test
     void shouldEventStartsAfterStartDate() {
         //given
-        BlockingScheduledExecutionService service = Haste.withFixedClockFromNow();
+        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClockFromNow();
         LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
         Event event = new Event(eventTime, service);
         //when
