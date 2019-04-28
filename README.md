@@ -19,20 +19,21 @@ Here comes the idea to create an open source library to help write tests
 <dependency>
     <groupId>io.github.krasnoludkolo</groupId>
     <artifactId>haste</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 ```groovy
-compile 'io.github.krasnoludkolo:haste:0.1.0'
+compile 'io.github.krasnoludkolo:haste:0.2.0'
 ```
 
 
 ## Features
 
 ### TL;DR
-<i>Haste</i> provides the implementation of [ScheduledExecutorService](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html)
+<i>Haste</i> provides:
+- the implementation of [ScheduledExecutorService](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html)
 with ```advanceTimeBy``` method to simulate lapse of time.
-
+- the interface ```TimeSource``` to create abstraction over time
 ### Full version
 
 ##### Test scheduled tasks
@@ -77,6 +78,37 @@ public interface TimeSource {
     LocalDateTime now();
 }
 ```
+
+###### Standalone time source
+
+If you only need access to current time, without whole `ScheduledExecutionService` staff, you can use `MovableTimeSource` 
+with implements `TimeSource` interface. It simply works like in example
+
+```java
+class MovableTimeSourceTest {
+
+
+    @Test
+    void shouldNowReturnTimeWithOffset() {
+        Instant instant = Instant.ofEpochMilli(0);
+        ZoneId zoneId = ZoneId.systemDefault();
+        Clock clock = Clock.fixed(instant, zoneId);
+        MovableTimeSource timeSource = Haste.TimeSource.withFixedClock(clock);
+
+        timeSource.advanceTimeBy(1, TimeUnit.HOURS);
+
+        LocalDateTime now = timeSource.now();
+
+        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        assertEquals(expected, now);
+
+    }
+
+}
+
+```
+
+###### ScheduledExecutionService as time source
 ```BlockingScheduledExecutionService``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
 time like in example
 
@@ -107,13 +139,12 @@ class EventTest {
 
     @Test
     void shouldEventStartsAfterStartDate() {
-        //given
         BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
         LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
         Event event = new Event(eventTime, service);
-        //when
+        
         service.advanceTimeBy(2, TimeUnit.HOURS);
-        //then
+        
         assertTrue(event.hasAlreadyBegun());
     }
 }
