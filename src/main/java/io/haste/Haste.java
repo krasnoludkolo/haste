@@ -44,6 +44,14 @@ public final class Haste {
         }
 
         /**
+         * @return instance of TimeSource based on system clock
+         */
+        static io.haste.TimeSource systemTimeSource() {
+            return new SystemTimeSource();
+        }
+
+
+        /**
          * @return {@link io.haste.MovableTimeSource} instance with fixed clock with current time
          */
         public static MovableTimeSource withFixedClockFromNow() {

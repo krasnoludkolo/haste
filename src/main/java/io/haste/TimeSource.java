@@ -11,11 +11,4 @@ public interface TimeSource {
      */
     LocalDateTime now();
 
-    /**
-     * @return instance of TimeSource based on system clock
-     */
-    static TimeSource systemTimeSource() {
-        return new SystemTimeSource();
-    }
-
 }
