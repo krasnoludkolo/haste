@@ -46,7 +46,7 @@ public final class Haste {
         /**
          * @return instance of TimeSource based on system clock
          */
-        static io.haste.TimeSource systemTimeSource() {
+        public static io.haste.TimeSource systemTimeSource() {
             return new SystemTimeSource();
         }
 
