@@ -20,6 +20,9 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    jacoco{
+            excludes = ['io.haste.SystemTimeSource']
+    }
 }
 
 task javadocJar(type: Jar) {
