@@ -61,7 +61,4 @@ final class CurrentTimeMillsTest {
         assertEquals(10, currentTime);
     }
 
-
-
-
 }
