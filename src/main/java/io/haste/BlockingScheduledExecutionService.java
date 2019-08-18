@@ -52,6 +52,11 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         return LocalDateTime.now(clock);
     }
 
+    @Override
+    public long currentTimeMillis() {
+        return clock.millis();
+    }
+
     /**
      * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
      *

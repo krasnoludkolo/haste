@@ -12,4 +12,9 @@ public final class SystemTimeSource implements TimeSource {
         return LocalDateTime.now(clock);
     }
 
+    @Override
+    public long currentTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
 }
