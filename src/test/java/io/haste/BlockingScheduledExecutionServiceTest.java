@@ -148,6 +148,16 @@ class BlockingScheduledExecutionServiceTest {
         assertEquals(4, objectWithInteger.getA());
     }
 
+    @Test
+    void shouldNotThrowSOWhenPassingLongAmountOfTime() {
+        ObjectWithInteger objectWithInteger = new ObjectWithInteger();
+        AddRunnable runnable = new AddRunnable(objectWithInteger);
+        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+
+        executorService.scheduleWithFixedDelay(runnable, 1, 1, TimeUnit.MINUTES);
+        executorService.advanceTimeBy(15, TimeUnit.DAYS);
+    }
+
     class ObjectWithInteger {
         private int a = 0;
 
