@@ -1,5 +1,5 @@
 group 'io.github.krasnoludkolo'
-version '0.2.1'
+version '0.2.2'
 
 apply plugin: 'java'
 
@@ -93,6 +93,10 @@ jacocoTestReport {
         xml.enabled true
         html.enabled true
     }
+}
+
+jacoco {
+    toolVersion = "0.8.4"
 }
 
 check.dependsOn jacocoTestReport

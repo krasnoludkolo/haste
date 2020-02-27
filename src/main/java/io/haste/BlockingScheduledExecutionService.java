@@ -3,6 +3,7 @@ package io.haste;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -52,6 +53,11 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         return LocalDateTime.now(clock);
     }
 
+    @Override
+    public long currentTimeMillis() {
+        return clock.millis();
+    }
+
     /**
      * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
      *
@@ -82,7 +88,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
     }
 
     private void updateClock(long delay) {
-        clock = Clock.offset(clock, Duration.ofNanos(delay));
+        clock = Clock.fixed(Clock.offset(clock, Duration.ofNanos(delay)).instant(), ZoneId.systemDefault());
     }
 
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {

@@ -29,4 +29,9 @@ public final class MovableTimeSource implements TimeSource {
         clock = Clock.offset(clock, Duration.ofNanos(nanos));
     }
 
+    @Override
+    public long currentTimeMillis() {
+        return clock.millis();
+    }
+
 }
