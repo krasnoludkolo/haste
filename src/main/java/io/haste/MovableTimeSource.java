@@ -19,14 +19,23 @@ public final class MovableTimeSource implements TimeSource {
     }
 
     /**
-     * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
+     * Move internal clock by given amount of time
      *
      * @param delayTime amount of time to move
      * @param timeUnit  time unit of delay parameter
      */
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
-        long nanos = timeUnit.toNanos(delayTime);
-        clock = Clock.offset(clock, Duration.ofNanos(nanos));
+        Duration duration = Duration.ofNanos(timeUnit.toNanos(delayTime));
+        advanceTimeBy(duration);
+    }
+
+    /**
+     * Move internal clock by given duration
+     *
+     * @param duration amount of time to move
+     */
+    public void advanceTimeBy(Duration duration) {
+        clock = Clock.offset(clock, duration);
     }
 
     @Override
