@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MovableTimeSourceTest {
 
-
     @Test
     void shouldNowReturnTimeWithOffsetWhenMovedByTimeUnit() {
         Instant instant = Instant.ofEpochMilli(0);

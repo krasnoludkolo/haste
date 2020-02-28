@@ -52,18 +52,18 @@ public final class Haste {
 
 
         /**
-         * @return {@link io.haste.MovableTimeSource} instance with fixed clock with current time
+         * @return {@link StandaloneMovableTimeSource} instance with fixed clock with current time
          */
         public static MovableTimeSource withFixedClockFromNow() {
-            return new MovableTimeSource(Clock.systemDefaultZone());
+            return new StandaloneMovableTimeSource(Clock.systemDefaultZone());
         }
 
         /**
          * @param clock source of 'now'.
-         * @return {@link io.haste.MovableTimeSource} instance with fixed clock from given clock
+         * @return {@link StandaloneMovableTimeSource} instance with fixed clock from given clock
          */
         public static MovableTimeSource withFixedClock(Clock clock) {
-            return new MovableTimeSource(clock);
+            return new StandaloneMovableTimeSource(clock);
         }
 
     }
