@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorService, TimeSource {
+public final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorService, MovableTimeSource {
 
     private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
     private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
@@ -58,12 +58,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         return clock.millis();
     }
 
-    /**
-     * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
-     *
-     * @param delayTime amount of time to move
-     * @param timeUnit  time unit of delay parameter
-     */
+    @Override
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
         long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
@@ -75,6 +70,11 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
             runTask(task);
         }
         updateClock(remainingOffsetInNano);
+    }
+
+    @Override
+    public void advanceTimeBy(Duration duration) {
+        advanceTimeBy(duration.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     private boolean nextTaskIsInRange(long remainingOffsetInNano) {
