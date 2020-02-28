@@ -39,4 +39,16 @@ class MovableTimeSourceTest {
         assertEquals(expected, now);
     }
 
+    @Test
+    void shouldNotThrowSOWhenAdvancingTimeManyTimes() {
+        Instant instant = Instant.ofEpochMilli(0);
+        ZoneId zoneId = ZoneId.systemDefault();
+        Clock clock = Clock.fixed(instant, zoneId);
+        MovableTimeSource timeSource = Haste.TimeSource.withFixedClock(clock);
+
+        for (int i = 0; i < 10000; i++) {
+            timeSource.advanceTimeBy(1, TimeUnit.MINUTES);
+        }
+    }
+
 }

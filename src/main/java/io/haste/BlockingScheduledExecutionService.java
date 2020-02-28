@@ -3,6 +3,7 @@ package io.haste;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -87,7 +88,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
     }
 
     private void updateClock(long delay) {
-        clock = Clock.offset(clock, Duration.ofNanos(delay));
+        clock = Clock.fixed(Clock.offset(clock, Duration.ofNanos(delay)).instant(), ZoneId.systemDefault());
     }
 
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
