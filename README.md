@@ -109,7 +109,7 @@ class MovableTimeSourceTest {
 ```
 
 ###### ScheduledExecutionService as time source
-```BlockingScheduledExecutionService``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
+```ScheduledExecutorServiceWithMovableTime``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
 time like in example
 
 ```java
