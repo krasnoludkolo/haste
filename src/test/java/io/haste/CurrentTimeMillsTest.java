@@ -52,7 +52,7 @@ final class CurrentTimeMillsTest {
 
 
     @Test
-    void shouldReturnCorrectMillisTimeForCreatedvar() {
+    void shouldReturnCorrectMillisTimeForCreatedBlockingScheduledExecutionService() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
@@ -63,7 +63,7 @@ final class CurrentTimeMillsTest {
     }
 
     @Test
-    void shouldReturnCorrectMillisTimeForvarWithMovedTime() {
+    void shouldReturnCorrectMillisTimeForBlockingScheduledExecutionServiceWithMovedTime() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
@@ -76,7 +76,7 @@ final class CurrentTimeMillsTest {
     }
 
     @Test
-    void shouldReturnCorrectMillisTimeForWithMovedTimeByDuration() {
+    void shouldReturnCorrectMillisTimeForBlockingScheduledExecutionServiceWithMovedTimeByDuration() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
