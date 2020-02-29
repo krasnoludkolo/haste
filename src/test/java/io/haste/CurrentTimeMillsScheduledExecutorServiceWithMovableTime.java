@@ -76,7 +76,7 @@ final class CurrentTimeMillsScheduledExecutorServiceWithMovableTime {
     }
 
     @Test
-    void shouldReturnCorrectMillisTimeForvarWithMovedTimeByDuration() {
+    void shouldReturnCorrectMillisTimeForWithMovedTimeByDuration() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
