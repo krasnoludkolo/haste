@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-final class CurrentTimeMillsScheduledExecutorServiceWithMovableTime {
+final class CurrentTimeMillsTest {
 
     @Test
     void shouldReturnCorrectMillisTimeForCreatedMovableTimeSource() {

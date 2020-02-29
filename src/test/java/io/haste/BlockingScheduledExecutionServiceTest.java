@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class varScheduledExecutorServiceWithMovableTime {
+class BlockingScheduledExecutionServiceTest {
 
 
     private static final Runnable EMPTY_RUNNABLE = () -> {
@@ -158,7 +158,7 @@ class varScheduledExecutorServiceWithMovableTime {
         executorService.advanceTimeBy(15, TimeUnit.DAYS);
     }
 
-    class ObjectWithInteger {
+    static class ObjectWithInteger {
         private int a = 0;
 
         void add() {
@@ -170,11 +170,11 @@ class varScheduledExecutorServiceWithMovableTime {
         }
     }
 
-    class AddRunnable implements Runnable {
+    static class AddRunnable implements Runnable {
 
-        private varScheduledExecutorServiceWithMovableTime.ObjectWithInteger objectWithInteger;
+        private ObjectWithInteger objectWithInteger;
 
-        AddRunnable(varScheduledExecutorServiceWithMovableTime.ObjectWithInteger objectWithInteger) {
+        AddRunnable(ObjectWithInteger objectWithInteger) {
             this.objectWithInteger = objectWithInteger;
         }
 
@@ -184,7 +184,7 @@ class varScheduledExecutorServiceWithMovableTime {
         }
     }
 
-    class ObjectWithData {
+    static class ObjectWithData {
         private LocalDateTime localDateTime;
         private boolean isAfter;
 
@@ -193,7 +193,7 @@ class varScheduledExecutorServiceWithMovableTime {
         }
     }
 
-    class IsAfterRunnable implements Runnable {
+    static class IsAfterRunnable implements Runnable {
 
         private ScheduledExecutorServiceWithMovableTime service;
         private ObjectWithData object;

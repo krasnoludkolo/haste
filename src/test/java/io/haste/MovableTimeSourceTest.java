@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class MovableTimeSourceScheduledExecutorServiceWithMovableTime {
+class MovableTimeSourceTest {
 
     @Test
     void shouldNowReturnTimeWithOffsetWhenMovedByTimeUnit() {

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class EventScheduledExecutorServiceWithMovableTime {
+class EventTest {
 
     @Test
     void shouldEventStartsAfterStartDate() {
