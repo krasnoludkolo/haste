@@ -56,7 +56,7 @@ final class CurrentTimeMillsTest {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         long currentTime = service.currentTimeMillis();
         assertEquals(0, currentTime);
@@ -67,7 +67,7 @@ final class CurrentTimeMillsTest {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         service.advanceTimeBy(10, TimeUnit.MILLISECONDS);
 
@@ -80,7 +80,7 @@ final class CurrentTimeMillsTest {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         service.advanceTimeBy(Duration.ofMillis(10));
 

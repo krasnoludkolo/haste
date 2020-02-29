@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
-public final class StandaloneMovableTimeSource implements MovableTimeSource {
+final class StandaloneMovableTimeSource implements MovableTimeSource {
 
     private Clock clock;
 
@@ -18,22 +18,11 @@ public final class StandaloneMovableTimeSource implements MovableTimeSource {
         return LocalDateTime.now(clock);
     }
 
-    /**
-     * Move internal clock by given amount of time
-     *
-     * @param delayTime amount of time to move
-     * @param timeUnit  time unit of delay parameter
-     */
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
         Duration duration = Duration.ofNanos(timeUnit.toNanos(delayTime));
         advanceTimeBy(duration);
     }
 
-    /**
-     * Move internal clock by given duration
-     *
-     * @param duration amount of time to move
-     */
     public void advanceTimeBy(Duration duration) {
         clock = Clock.offset(clock, duration);
     }

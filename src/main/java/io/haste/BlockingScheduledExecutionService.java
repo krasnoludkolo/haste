@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorService, MovableTimeSource {
+final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorServiceWithMovableTime {
 
     private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
     private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();

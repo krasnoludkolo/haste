@@ -23,7 +23,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldExecuteAllScheduledJobs() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
 
         ScheduledFuture<Integer> schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
         ScheduledFuture schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
@@ -44,7 +44,7 @@ class BlockingScheduledExecutionServiceTest {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var executorService = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         executorService.advanceTimeBy(1, TimeUnit.HOURS);
 
@@ -56,7 +56,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldNotRunCanceledJobs() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
 
         ScheduledFuture schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
         schedule1.cancel(true);
@@ -69,7 +69,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldRunOnceScheduledJob() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
 
         executorService.schedule(runnable, 1, TimeUnit.SECONDS);
         executorService.advanceTimeBy(4, TimeUnit.SECONDS);
@@ -80,7 +80,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldChangeInternalClockToEveryScheduledJobTime() {
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
         ObjectWithData object = new ObjectWithData(executorService.now().plusHours(3));
         IsAfterRunnable runnable = new IsAfterRunnable(executorService, object);
 
@@ -94,7 +94,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldGetValueFromScheduledCallable() throws ExecutionException, InterruptedException {
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
         ScheduledFuture<Integer> schedule = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
 
         executorService.advanceTimeBy(2, TimeUnit.HOURS);
@@ -104,7 +104,7 @@ class BlockingScheduledExecutionServiceTest {
 
     @Test
     void shouldScheduledFutureBeDoneAfterExecuteCallable() {
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
         ScheduledFuture<Integer> schedule = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.HOURS);
 
         executorService.advanceTimeBy(2, TimeUnit.HOURS);
@@ -116,7 +116,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldRunPeriodicTaskWithDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+        var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
 
         executorService.scheduleAtFixedRate(runnable, 1, 3, TimeUnit.SECONDS);
         executorService.advanceTimeBy(2, TimeUnit.SECONDS);
@@ -128,7 +128,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldPeriodicallyRunPeriodicTaskWithDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+        var executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
 
         executorService.scheduleAtFixedRate(runnable, 1, 3, TimeUnit.NANOSECONDS);
         executorService.advanceTimeBy(11, TimeUnit.NANOSECONDS);
@@ -140,7 +140,7 @@ class BlockingScheduledExecutionServiceTest {
     void shouldPeriodicallyRunPeriodicTaskWithFixedDelay() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+        var executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
 
         executorService.scheduleWithFixedDelay(runnable, 1, 3, TimeUnit.NANOSECONDS);
         executorService.advanceTimeBy(11, TimeUnit.NANOSECONDS);
@@ -152,13 +152,13 @@ class BlockingScheduledExecutionServiceTest {
     void shouldNotThrowSOWhenPassingLongAmountOfTime() {
         ObjectWithInteger objectWithInteger = new ObjectWithInteger();
         AddRunnable runnable = new AddRunnable(objectWithInteger);
-        BlockingScheduledExecutionService executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
+        var executorService = Haste.ScheduledExecutionService.withFixedClock(Clock.fixed(Instant.EPOCH, ZoneId.systemDefault()));
 
         executorService.scheduleWithFixedDelay(runnable, 1, 1, TimeUnit.MINUTES);
         executorService.advanceTimeBy(15, TimeUnit.DAYS);
     }
 
-    class ObjectWithInteger {
+    static class ObjectWithInteger {
         private int a = 0;
 
         void add() {
@@ -170,11 +170,11 @@ class BlockingScheduledExecutionServiceTest {
         }
     }
 
-    class AddRunnable implements Runnable {
+    static class AddRunnable implements Runnable {
 
-        private BlockingScheduledExecutionServiceTest.ObjectWithInteger objectWithInteger;
+        private ObjectWithInteger objectWithInteger;
 
-        AddRunnable(BlockingScheduledExecutionServiceTest.ObjectWithInteger objectWithInteger) {
+        AddRunnable(ObjectWithInteger objectWithInteger) {
             this.objectWithInteger = objectWithInteger;
         }
 
@@ -184,7 +184,7 @@ class BlockingScheduledExecutionServiceTest {
         }
     }
 
-    class ObjectWithData {
+    static class ObjectWithData {
         private LocalDateTime localDateTime;
         private boolean isAfter;
 
@@ -193,12 +193,12 @@ class BlockingScheduledExecutionServiceTest {
         }
     }
 
-    class IsAfterRunnable implements Runnable {
+    static class IsAfterRunnable implements Runnable {
 
-        private BlockingScheduledExecutionService service;
+        private ScheduledExecutorServiceWithMovableTime service;
         private ObjectWithData object;
 
-        IsAfterRunnable(BlockingScheduledExecutionService service, ObjectWithData object) {
+        IsAfterRunnable(ScheduledExecutorServiceWithMovableTime service, ObjectWithData object) {
             this.service = service;
             this.object = object;
         }
