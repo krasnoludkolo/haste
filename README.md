@@ -76,7 +76,7 @@ With <i>Haste</i> comes the fallowing interface
 ```java
 public interface TimeSource {
     LocalDateTime now();
-    //and more
+    //and more version of "now"
 }
 ```
 
