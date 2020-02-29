@@ -19,9 +19,9 @@ public final class Haste {
         }
 
         /**
-         * @return {@link io.haste.BlockingScheduledExecutionService} instance with fixed clock with current time
+         * @return {@link io.haste.ScheduledExecutorServiceWithMovableTime} instance with fixed clock with current time
          */
-        public static BlockingScheduledExecutionService withFixedClockFromNow() {
+        public static ScheduledExecutorServiceWithMovableTime withFixedClockFromNow() {
             return new BlockingScheduledExecutionService(Clock.systemDefaultZone());
         }
 
@@ -29,7 +29,7 @@ public final class Haste {
          * @param clock source of 'now'.
          * @return {@link io.haste.BlockingScheduledExecutionService} instance with fixed clock from given clock
          */
-        public static BlockingScheduledExecutionService withFixedClock(Clock clock) {
+        public static ScheduledExecutorServiceWithMovableTime withFixedClock(Clock clock) {
             return new BlockingScheduledExecutionService(clock);
         }
 
@@ -52,7 +52,7 @@ public final class Haste {
 
 
         /**
-         * @return {@link StandaloneMovableTimeSource} instance with fixed clock with current time
+         * @return Instance with fixed clock with current time
          */
         public static MovableTimeSource withFixedClockFromNow() {
             return new StandaloneMovableTimeSource(Clock.systemDefaultZone());
@@ -60,7 +60,7 @@ public final class Haste {
 
         /**
          * @param clock source of 'now'.
-         * @return {@link StandaloneMovableTimeSource} instance with fixed clock from given clock
+         * @return Instance with fixed clock from given clock
          */
         public static MovableTimeSource withFixedClock(Clock clock) {
             return new StandaloneMovableTimeSource(clock);

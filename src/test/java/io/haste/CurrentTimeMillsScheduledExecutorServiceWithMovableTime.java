@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-final class CurrentTimeMillsTest {
+final class CurrentTimeMillsScheduledExecutorServiceWithMovableTime {
 
     @Test
     void shouldReturnCorrectMillisTimeForCreatedMovableTimeSource() {
@@ -52,22 +52,22 @@ final class CurrentTimeMillsTest {
 
 
     @Test
-    void shouldReturnCorrectMillisTimeForCreatedBlockingScheduledExecutionService() {
+    void shouldReturnCorrectMillisTimeForCreatedvar() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         long currentTime = service.currentTimeMillis();
         assertEquals(0, currentTime);
     }
 
     @Test
-    void shouldReturnCorrectMillisTimeForBlockingScheduledExecutionServiceWithMovedTime() {
+    void shouldReturnCorrectMillisTimeForvarWithMovedTime() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         service.advanceTimeBy(10, TimeUnit.MILLISECONDS);
 
@@ -76,11 +76,11 @@ final class CurrentTimeMillsTest {
     }
 
     @Test
-    void shouldReturnCorrectMillisTimeForBlockingScheduledExecutionServiceWithMovedTimeByDuration() {
+    void shouldReturnCorrectMillisTimeForvarWithMovedTimeByDuration() {
         Instant instant = Instant.ofEpochMilli(0);
         ZoneId zoneId = ZoneId.systemDefault();
         Clock clock = Clock.fixed(instant, zoneId);
-        BlockingScheduledExecutionService service = Haste.ScheduledExecutionService.withFixedClock(clock);
+        var service = Haste.ScheduledExecutionService.withFixedClock(clock);
 
         service.advanceTimeBy(Duration.ofMillis(10));
 

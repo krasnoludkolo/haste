@@ -39,7 +39,7 @@ with ```advanceTimeBy``` method to simulate lapse of time.
 ##### Test scheduled tasks
 Some actions in your system may also plan another actions to be done in the future. 
 E.g. when you add a sport fixture you may want to check the result after it has finished
-When using normal java scheduler it is hard to test results of scheduled jobs without e.g. mocking. 
+When using normal java scheduler it is hard to scheduledExecutorServiceWithMovableTime results of scheduled jobs without e.g. mocking. 
 Here comes the implementation of ScheduledExecutorService with ```advanceTimeBy``` method.
  
  ```java
@@ -49,13 +49,13 @@ class FooTest{
         private static final Callable<Integer> RETURN_ONE_CALLABLE = () -> 1;
     
         @Test
-        void shouldExecuteAllScheduledJobs() throws ExecutionException, InterruptedException {
-            BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        void shouldExecuteAllScheduledJobs() throws ExecutionException {
+            var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
     
-            ScheduledFuture<Integer> schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
-            ScheduledFuture schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
-            ScheduledFuture schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
-            ScheduledFuture schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
+            var = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
+            var schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
+            var schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
+            var schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
     
             executorService.advanceTimeBy(4, TimeUnit.SECONDS);
     
@@ -76,17 +76,17 @@ With <i>Haste</i> comes the fallowing interface
 ```java
 public interface TimeSource {
     LocalDateTime now();
+    //and more
 }
 ```
 
 ###### Standalone time source
 
 If you only need access to current time, without whole `ScheduledExecutionService` staff, you can use `MovableTimeSource` 
-with implements `TimeSource` interface. It simply works like in example
+which extends `TimeSource` interface. It simply works like in example
 
 ```java
 class MovableTimeSourceTest {
-
 
     @Test
     void shouldNowReturnTimeWithOffset() {

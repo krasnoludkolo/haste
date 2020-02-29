@@ -3,7 +3,7 @@ package io.haste;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
-public final class SystemTimeSource implements TimeSource {
+final class SystemTimeSource implements TimeSource {
 
     private Clock clock = Clock.systemDefaultZone();
 

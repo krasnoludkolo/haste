@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutorService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BlockingExecutorServiceTest {
+class BlockingExecutorServiceScheduledExecutorServiceWithMovableTime {
 
     @Test
     void shouldExecuteRunnable() {
