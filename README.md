@@ -19,11 +19,11 @@ Here comes the idea to create an open source library to help write tests
 <dependency>
     <groupId>io.github.krasnoludkolo</groupId>
     <artifactId>haste</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
 </dependency>
 ```
 ```groovy
-compile 'io.github.krasnoludkolo:haste:0.2.1'
+compile 'io.github.krasnoludkolo:haste:0.2.2'
 ```
 
 
