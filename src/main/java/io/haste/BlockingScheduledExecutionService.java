@@ -97,7 +97,6 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public void advanceTimeBy(Duration duration) {
-        Objects.requireNonNull(duration);
         advanceTimeBy(duration.toNanos(), TimeUnit.NANOSECONDS);
     }
 
