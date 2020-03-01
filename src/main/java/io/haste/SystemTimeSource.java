@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 final class SystemTimeSource implements TimeSource {
 
-    private Clock clock = Clock.systemDefaultZone();
+    private final Clock clock = Clock.systemDefaultZone();
 
     @Override
     public LocalDateTime now() {
