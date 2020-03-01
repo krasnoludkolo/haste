@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -17,11 +18,16 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
     private Clock clock;
 
     BlockingScheduledExecutionService(Clock clock) {
+        Objects.requireNonNull(clock);
         this.clock = Clock.fixed(clock.instant(), clock.getZone());
     }
 
     @Override
     public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
+        Objects.requireNonNull(runnable);
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         var scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -29,6 +35,10 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
+        Objects.requireNonNull(callable);
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         AbstractRunnableScheduledFuture<V> scheduledFuture = new ScheduledFutureWithCallable<>(delay, timeUnit, callable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -36,6 +46,11 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
+        Objects.requireNonNull(runnable);
+        if (initialDelay < 0) throw new IllegalArgumentException();
+        if (period < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         var scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -43,6 +58,11 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
+        Objects.requireNonNull(runnable);
+        if (initialDelay < 0) throw new IllegalArgumentException();
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         var scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -60,6 +80,9 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
+        if (delayTime < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
         while (!scheduledFutures.isEmpty() && nextTaskIsInRange(remainingOffsetInNano)) {
@@ -74,6 +97,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public void advanceTimeBy(Duration duration) {
+        Objects.requireNonNull(duration);
         advanceTimeBy(duration.toNanos(), TimeUnit.NANOSECONDS);
     }
 
