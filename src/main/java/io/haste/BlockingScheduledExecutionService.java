@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorServiceWithMovableTime {
 
     private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
-    private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
+    private final PriorityQueue<AbstractRunnableScheduledFuture<?>> scheduledFutures = new PriorityQueue<>();
 
     private Clock clock;
 
@@ -22,7 +22,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
+        var scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
@@ -36,14 +36,14 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
+        var scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
+        var scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
@@ -63,7 +63,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
         long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
         while (!scheduledFutures.isEmpty() && nextTaskIsInRange(remainingOffsetInNano)) {
-            RunnableScheduledFuture task = scheduledFutures.poll();
+            var task = scheduledFutures.poll();
             long delay = task.getDelay(TimeUnit.NANOSECONDS);
             updateClock(delay);
             remainingOffsetInNano -= delay;
@@ -81,7 +81,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
         return scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= remainingOffsetInNano;
     }
 
-    private void runTask(RunnableScheduledFuture task) {
+    private void runTask(RunnableScheduledFuture<?> task) {
         if (!task.isCancelled()) {
             task.run();
         }
