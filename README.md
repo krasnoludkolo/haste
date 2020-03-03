@@ -52,7 +52,7 @@ class FooTest{
         void shouldExecuteAllScheduledJobs() throws ExecutionException {
             var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
     
-            var = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
+            var schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
             var schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
             var schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
             var schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
