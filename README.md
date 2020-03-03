@@ -75,7 +75,7 @@ class FooTest{
 With <i>Haste</i> comes the fallowing interface 
 ```java
 public interface TimeSource {
-    LocalDateTime now();
+    ZonedDateTime now();
     //and more version of "now"
 }
 ```
@@ -97,9 +97,9 @@ class MovableTimeSourceTest {
 
         timeSource.advanceTimeBy(1, TimeUnit.HOURS);
 
-        LocalDateTime now = timeSource.now();
+        ZonedDateTime now = timeSource.now();
 
-        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        ZonedDateTime expected = ZonedDateTime.now(clock).plusHours(1);
         assertEquals(expected, now);
 
     }
@@ -116,10 +116,10 @@ time like in example
 
 class Event{
 
-    private LocalDateTime eventTime;
+    private ZonedDateTime eventTime;
     private TimeSource timeSource;
 
-    Event(LocalDateTime eventTime, TimeSource timeSource) {
+    Event(ZonedDateTime eventTime, TimeSource timeSource) {
         if (timeSource.now().isAfter(eventTime)) {
             throw new IllegalArgumentException("Cannot make event in past");
         }
@@ -140,7 +140,7 @@ class EventTest {
     @Test
     void shouldEventStartsAfterStartDate() {
         BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
-        LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
+        ZonedDateTime eventTime = ZonedDateTime.now().plusHours(1);
         Event event = new Event(eventTime, service);
         
         service.advanceTimeBy(2, TimeUnit.HOURS);

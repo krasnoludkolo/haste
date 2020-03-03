@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
@@ -48,9 +48,9 @@ class BlockingScheduledExecutionServiceTest {
 
         executorService.advanceTimeBy(1, TimeUnit.HOURS);
 
-        LocalDateTime now = executorService.now();
+        var now = executorService.now();
 
-        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        var expected = ZonedDateTime.now(clock).plusHours(1);
         assertEquals(expected, now);
     }
 
@@ -185,18 +185,18 @@ class BlockingScheduledExecutionServiceTest {
     }
 
     static class ObjectWithData {
-        private LocalDateTime localDateTime;
+        private final ZonedDateTime ZonedDateTime;
         private boolean isAfter;
 
-        ObjectWithData(LocalDateTime localDateTime) {
-            this.localDateTime = localDateTime;
+        ObjectWithData(ZonedDateTime ZonedDateTime) {
+            this.ZonedDateTime = ZonedDateTime;
         }
     }
 
     static class IsAfterRunnable implements Runnable {
 
-        private ScheduledExecutorServiceWithMovableTime service;
-        private ObjectWithData object;
+        private final ScheduledExecutorServiceWithMovableTime service;
+        private final ObjectWithData object;
 
         IsAfterRunnable(ScheduledExecutorServiceWithMovableTime service, ObjectWithData object) {
             this.service = service;
@@ -205,7 +205,7 @@ class BlockingScheduledExecutionServiceTest {
 
         @Override
         public void run() {
-            if (object.localDateTime.isAfter(service.now())) {
+            if (object.ZonedDateTime.isAfter(service.now())) {
                 object.isAfter = true;
             }
         }

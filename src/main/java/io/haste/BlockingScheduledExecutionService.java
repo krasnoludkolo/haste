@@ -2,7 +2,7 @@ package io.haste;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
@@ -68,7 +68,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
     }
 
     @Override
-    public LocalDateTime now() {
+    public ZonedDateTime now() {
         return timeSource.now();
     }
 
@@ -115,7 +115,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
 
-        final LocalDateTime scheduledTime;
+        final ZonedDateTime scheduledTime;
         final long delayInNanos;
         boolean canceled;
         boolean done;

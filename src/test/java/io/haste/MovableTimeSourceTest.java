@@ -18,9 +18,9 @@ class MovableTimeSourceTest {
 
         timeSource.advanceTimeBy(1, TimeUnit.HOURS);
 
-        LocalDateTime now = timeSource.now();
+        var now = timeSource.now();
 
-        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        var expected = ZonedDateTime.now(clock).plusHours(1);
         assertEquals(expected, now);
     }
 
@@ -33,9 +33,9 @@ class MovableTimeSourceTest {
 
         timeSource.advanceTimeBy(Duration.ofHours(1));
 
-        LocalDateTime now = timeSource.now();
+        var now = timeSource.now();
 
-        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        var expected = ZonedDateTime.now(clock).plusHours(1);
         assertEquals(expected, now);
     }
 
