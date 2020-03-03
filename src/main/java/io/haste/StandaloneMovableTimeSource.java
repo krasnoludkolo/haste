@@ -2,7 +2,8 @@ package io.haste;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +17,8 @@ final class StandaloneMovableTimeSource implements MovableTimeSource {
     }
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    public ZonedDateTime now() {
+        return ZonedDateTime.now(clock);
     }
 
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
@@ -29,7 +30,7 @@ final class StandaloneMovableTimeSource implements MovableTimeSource {
     }
 
     public void advanceTimeBy(Duration duration) {
-        clock = Clock.offset(clock, duration);
+        clock = Clock.fixed(Clock.offset(clock, duration).instant(), ZoneId.systemDefault());
     }
 
     @Override

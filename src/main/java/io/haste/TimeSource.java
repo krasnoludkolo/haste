@@ -1,6 +1,6 @@
 package io.haste;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public interface TimeSource {
 
@@ -9,7 +9,7 @@ public interface TimeSource {
      *
      * @return current date-time
      */
-    LocalDateTime now();
+    ZonedDateTime now();
 
 
     /**

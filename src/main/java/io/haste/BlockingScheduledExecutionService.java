@@ -2,8 +2,7 @@ package io.haste;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
@@ -15,11 +14,11 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
     private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
     private final PriorityQueue<AbstractRunnableScheduledFuture<?>> scheduledFutures = new PriorityQueue<>();
 
-    private Clock clock;
+    private final MovableTimeSource timeSource;
 
     BlockingScheduledExecutionService(Clock clock) {
         Objects.requireNonNull(clock);
-        this.clock = Clock.fixed(clock.instant(), clock.getZone());
+        this.timeSource = new StandaloneMovableTimeSource(clock);
     }
 
     @Override
@@ -69,13 +68,13 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
     }
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    public ZonedDateTime now() {
+        return timeSource.now();
     }
 
     @Override
     public long currentTimeMillis() {
-        return clock.millis();
+        return timeSource.currentTimeMillis();
     }
 
     @Override
@@ -111,18 +110,18 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
     }
 
     private void updateClock(long delay) {
-        clock = Clock.fixed(Clock.offset(clock, Duration.ofNanos(delay)).instant(), ZoneId.systemDefault());
+        timeSource.advanceTimeBy(delay, TimeUnit.NANOSECONDS);
     }
 
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
 
-        final LocalDateTime scheduledTime;
+        final ZonedDateTime scheduledTime;
         final long delayInNanos;
         boolean canceled;
         boolean done;
 
         private AbstractRunnableScheduledFuture(long delay, TimeUnit timeUnit) {
-            scheduledTime = LocalDateTime.now(clock);
+            scheduledTime = timeSource.now();
             delayInNanos = timeUnit.toNanos(delay);
             this.canceled = false;
             this.done = false;
@@ -130,7 +129,7 @@ final class BlockingScheduledExecutionService extends BlockingExecutorService im
 
         @Override
         public long getDelay(TimeUnit timeUnit) {
-            Duration d = Duration.between(LocalDateTime.now(clock), scheduledTime.plusNanos(delayInNanos));
+            Duration d = Duration.between(timeSource.now(), scheduledTime.plusNanos(delayInNanos));
             return TimeUnit.NANOSECONDS.convert(d.toNanos(), timeUnit);
         }
 
