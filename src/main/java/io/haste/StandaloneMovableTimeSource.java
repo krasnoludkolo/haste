@@ -3,6 +3,7 @@ package io.haste;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +30,7 @@ final class StandaloneMovableTimeSource implements MovableTimeSource {
     }
 
     public void advanceTimeBy(Duration duration) {
-        clock = Clock.offset(clock, duration);
+        clock = Clock.fixed(Clock.offset(clock, duration).instant(), ZoneId.systemDefault());
     }
 
     @Override
