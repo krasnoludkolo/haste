@@ -2,33 +2,42 @@ package io.haste;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorService, TimeSource {
+final class BlockingScheduledExecutionService extends BlockingExecutorService implements ScheduledExecutorServiceWithMovableTime {
 
     private static final Logger LOGGER = Logger.getLogger(BlockingScheduledExecutionService.class.getName());
-    private PriorityQueue<AbstractRunnableScheduledFuture> scheduledFutures = new PriorityQueue<>();
+    private final PriorityQueue<AbstractRunnableScheduledFuture<?>> scheduledFutures = new PriorityQueue<>();
 
-    private Clock clock;
+    private final MovableTimeSource timeSource;
 
     BlockingScheduledExecutionService(Clock clock) {
-        this.clock = Clock.fixed(clock.instant(), clock.getZone());
+        Objects.requireNonNull(clock);
+        this.timeSource = new StandaloneMovableTimeSource(clock);
     }
 
     @Override
     public ScheduledFuture<?> schedule(Runnable runnable, long delay, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
+        Objects.requireNonNull(runnable);
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
+        var scheduledFuture = new ScheduledFutureWithRunnable(delay, timeUnit, runnable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit timeUnit) {
+        Objects.requireNonNull(callable);
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         AbstractRunnableScheduledFuture<V> scheduledFuture = new ScheduledFutureWithCallable<>(delay, timeUnit, callable);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
@@ -36,39 +45,47 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable runnable, long initialDelay, long period, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
+        Objects.requireNonNull(runnable);
+        if (initialDelay < 0) throw new IllegalArgumentException();
+        if (period < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
+        var scheduledFuture = new FixedRatePeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, period);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit) {
-        AbstractRunnableScheduledFuture scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
+        Objects.requireNonNull(runnable);
+        if (initialDelay < 0) throw new IllegalArgumentException();
+        if (delay < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
+        var scheduledFuture = new FixedDelayPeriodicScheduledFutureWithRunnable(runnable, initialDelay, timeUnit, delay);
         scheduledFutures.add(scheduledFuture);
         return scheduledFuture;
     }
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    public ZonedDateTime now() {
+        return timeSource.now();
     }
 
     @Override
     public long currentTimeMillis() {
-        return clock.millis();
+        return timeSource.currentTimeMillis();
     }
 
-    /**
-     * Move internal clock by given amount of time and run all scheduled jobs in given time interval.
-     *
-     * @param delayTime amount of time to move
-     * @param timeUnit  time unit of delay parameter
-     */
+    @Override
     public void advanceTimeBy(long delayTime, TimeUnit timeUnit) {
+        if (delayTime < 0) throw new IllegalArgumentException();
+        Objects.requireNonNull(timeUnit);
+
         long remainingOffsetInNano = timeUnit.toNanos(delayTime);
 
         while (!scheduledFutures.isEmpty() && nextTaskIsInRange(remainingOffsetInNano)) {
-            RunnableScheduledFuture task = scheduledFutures.poll();
+            var task = scheduledFutures.poll();
             long delay = task.getDelay(TimeUnit.NANOSECONDS);
             updateClock(delay);
             remainingOffsetInNano -= delay;
@@ -77,29 +94,34 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
         updateClock(remainingOffsetInNano);
     }
 
+    @Override
+    public void advanceTimeBy(Duration duration) {
+        advanceTimeBy(duration.toNanos(), TimeUnit.NANOSECONDS);
+    }
+
     private boolean nextTaskIsInRange(long remainingOffsetInNano) {
         return scheduledFutures.peek().getDelay(TimeUnit.NANOSECONDS) <= remainingOffsetInNano;
     }
 
-    private void runTask(RunnableScheduledFuture task) {
+    private void runTask(RunnableScheduledFuture<?> task) {
         if (!task.isCancelled()) {
             task.run();
         }
     }
 
     private void updateClock(long delay) {
-        clock = Clock.fixed(Clock.offset(clock, Duration.ofNanos(delay)).instant(), ZoneId.systemDefault());
+        timeSource.advanceTimeBy(delay, TimeUnit.NANOSECONDS);
     }
 
     private abstract class AbstractRunnableScheduledFuture<V> implements RunnableScheduledFuture<V> {
 
-        final LocalDateTime scheduledTime;
+        final ZonedDateTime scheduledTime;
         final long delayInNanos;
         boolean canceled;
         boolean done;
 
         private AbstractRunnableScheduledFuture(long delay, TimeUnit timeUnit) {
-            scheduledTime = LocalDateTime.now(clock);
+            scheduledTime = timeSource.now();
             delayInNanos = timeUnit.toNanos(delay);
             this.canceled = false;
             this.done = false;
@@ -107,7 +129,7 @@ public final class BlockingScheduledExecutionService extends BlockingExecutorSer
 
         @Override
         public long getDelay(TimeUnit timeUnit) {
-            Duration d = Duration.between(LocalDateTime.now(clock), scheduledTime.plusNanos(delayInNanos));
+            Duration d = Duration.between(timeSource.now(), scheduledTime.plusNanos(delayInNanos));
             return TimeUnit.NANOSECONDS.convert(d.toNanos(), timeUnit);
         }
 

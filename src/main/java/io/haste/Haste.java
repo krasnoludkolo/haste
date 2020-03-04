@@ -11,7 +11,7 @@ public final class Haste {
     }
 
     /**
-     * Allows to create {@link io.haste.BlockingScheduledExecutionService} instances
+     * Allows to create {@link io.haste.ScheduledExecutorServiceWithMovableTime} instances
      */
     public static class ScheduledExecutionService {
 
@@ -19,17 +19,17 @@ public final class Haste {
         }
 
         /**
-         * @return {@link io.haste.BlockingScheduledExecutionService} instance with fixed clock with current time
+         * @return {@link io.haste.ScheduledExecutorServiceWithMovableTime} instance with fixed clock with current time
          */
-        public static BlockingScheduledExecutionService withFixedClockFromNow() {
+        public static ScheduledExecutorServiceWithMovableTime withFixedClockFromNow() {
             return new BlockingScheduledExecutionService(Clock.systemDefaultZone());
         }
 
         /**
          * @param clock source of 'now'.
-         * @return {@link io.haste.BlockingScheduledExecutionService} instance with fixed clock from given clock
+         * @return {@link io.haste.ScheduledExecutorServiceWithMovableTime} instance with fixed clock from given clock
          */
-        public static BlockingScheduledExecutionService withFixedClock(Clock clock) {
+        public static ScheduledExecutorServiceWithMovableTime withFixedClock(Clock clock) {
             return new BlockingScheduledExecutionService(clock);
         }
 
@@ -44,7 +44,7 @@ public final class Haste {
         }
 
         /**
-         * @return instance of TimeSource based on system clock
+         * @return instance of {@link io.haste.TimeSource} based on system clock
          */
         public static io.haste.TimeSource systemTimeSource() {
             return new SystemTimeSource();
@@ -52,18 +52,18 @@ public final class Haste {
 
 
         /**
-         * @return {@link io.haste.MovableTimeSource} instance with fixed clock with current time
+         * @return create {@link io.haste.MovableTimeSource} instance with fixed clock with current time
          */
         public static MovableTimeSource withFixedClockFromNow() {
-            return new MovableTimeSource(Clock.systemDefaultZone());
+            return new StandaloneMovableTimeSource(Clock.systemDefaultZone());
         }
 
         /**
          * @param clock source of 'now'.
-         * @return {@link io.haste.MovableTimeSource} instance with fixed clock from given clock
+         * @return create {@link io.haste.MovableTimeSource} instance with fixed clock from given clock
          */
         public static MovableTimeSource withFixedClock(Clock clock) {
-            return new MovableTimeSource(clock);
+            return new StandaloneMovableTimeSource(clock);
         }
 
     }

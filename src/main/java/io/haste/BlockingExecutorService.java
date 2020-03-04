@@ -2,6 +2,7 @@ package io.haste;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,8 @@ class BlockingExecutorService extends AbstractExecutorService implements Executo
 
     @Override
     public boolean awaitTermination(long l, TimeUnit timeUnit) {
+        Objects.requireNonNull(timeUnit);
+        if (l < 0) throw new IllegalArgumentException();
         shutdown();
         return true;
     }

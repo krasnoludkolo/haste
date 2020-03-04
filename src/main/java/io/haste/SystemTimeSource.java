@@ -1,15 +1,15 @@
 package io.haste;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
-public final class SystemTimeSource implements TimeSource {
+final class SystemTimeSource implements TimeSource {
 
-    private Clock clock = Clock.systemDefaultZone();
+    private final Clock clock = Clock.systemDefaultZone();
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    public ZonedDateTime now() {
+        return ZonedDateTime.now(clock);
     }
 
     @Override

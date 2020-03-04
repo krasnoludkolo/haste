@@ -19,11 +19,11 @@ Here comes the idea to create an open source library to help write tests
 <dependency>
     <groupId>io.github.krasnoludkolo</groupId>
     <artifactId>haste</artifactId>
-    <version>0.2.2</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 ```groovy
-compile 'io.github.krasnoludkolo:haste:0.2.2'
+compile 'io.github.krasnoludkolo:haste:0.3.0'
 ```
 
 
@@ -39,7 +39,7 @@ with ```advanceTimeBy``` method to simulate lapse of time.
 ##### Test scheduled tasks
 Some actions in your system may also plan another actions to be done in the future. 
 E.g. when you add a sport fixture you may want to check the result after it has finished
-When using normal java scheduler it is hard to test results of scheduled jobs without e.g. mocking. 
+When using normal java scheduler it is hard to scheduledExecutorServiceWithMovableTime results of scheduled jobs without e.g. mocking. 
 Here comes the implementation of ScheduledExecutorService with ```advanceTimeBy``` method.
  
  ```java
@@ -49,13 +49,13 @@ class FooTest{
         private static final Callable<Integer> RETURN_ONE_CALLABLE = () -> 1;
     
         @Test
-        void shouldExecuteAllScheduledJobs() throws ExecutionException, InterruptedException {
-            BlockingScheduledExecutionService executorService = BlockingScheduledExecutionService.withFixedClockFromNow();
+        void shouldExecuteAllScheduledJobs() throws ExecutionException {
+            var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
     
-            ScheduledFuture<Integer> schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
-            ScheduledFuture schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
-            ScheduledFuture schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
-            ScheduledFuture schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
+            var schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
+            var schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
+            var schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
+            var schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
     
             executorService.advanceTimeBy(4, TimeUnit.SECONDS);
     
@@ -75,18 +75,18 @@ class FooTest{
 With <i>Haste</i> comes the fallowing interface 
 ```java
 public interface TimeSource {
-    LocalDateTime now();
+    ZonedDateTime now();
+    //and more version of "now"
 }
 ```
 
 ###### Standalone time source
 
 If you only need access to current time, without whole `ScheduledExecutionService` staff, you can use `MovableTimeSource` 
-with implements `TimeSource` interface. It simply works like in example
+which extends `TimeSource` interface. It simply works like in example
 
 ```java
 class MovableTimeSourceTest {
-
 
     @Test
     void shouldNowReturnTimeWithOffset() {
@@ -97,9 +97,9 @@ class MovableTimeSourceTest {
 
         timeSource.advanceTimeBy(1, TimeUnit.HOURS);
 
-        LocalDateTime now = timeSource.now();
+        ZonedDateTime now = timeSource.now();
 
-        LocalDateTime expected = LocalDateTime.now(clock).plusHours(1);
+        ZonedDateTime expected = ZonedDateTime.now(clock).plusHours(1);
         assertEquals(expected, now);
 
     }
@@ -109,17 +109,17 @@ class MovableTimeSourceTest {
 ```
 
 ###### ScheduledExecutionService as time source
-```BlockingScheduledExecutionService``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
+```ScheduledExecutorServiceWithMovableTime``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
 time like in example
 
 ```java
 
 class Event{
 
-    private LocalDateTime eventTime;
+    private ZonedDateTime eventTime;
     private TimeSource timeSource;
 
-    Event(LocalDateTime eventTime, TimeSource timeSource) {
+    Event(ZonedDateTime eventTime, TimeSource timeSource) {
         if (timeSource.now().isAfter(eventTime)) {
             throw new IllegalArgumentException("Cannot make event in past");
         }
@@ -140,7 +140,7 @@ class EventTest {
     @Test
     void shouldEventStartsAfterStartDate() {
         BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
-        LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
+        ZonedDateTime eventTime = ZonedDateTime.now().plusHours(1);
         Event event = new Event(eventTime, service);
         
         service.advanceTimeBy(2, TimeUnit.HOURS);

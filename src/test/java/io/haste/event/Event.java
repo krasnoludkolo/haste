@@ -2,14 +2,14 @@ package io.haste.event;
 
 import io.haste.TimeSource;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 class Event{
 
-    private LocalDateTime eventTime;
+    private ZonedDateTime eventTime;
     private TimeSource timeSource;
 
-    Event(LocalDateTime eventTime, TimeSource timeSource) {
+    Event(ZonedDateTime eventTime, TimeSource timeSource) {
         if (timeSource.now().isAfter(eventTime)) {
             throw new IllegalArgumentException("Cannot make event in past");
         }
