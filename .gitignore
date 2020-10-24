@@ -20,9 +20,7 @@
 hs_err_pid*
 .gradle/
 .idea/
-gradle/
-gradlew
-gradlew.bat
 out/
+/build
 src/main/resources/
 src/test/resources/

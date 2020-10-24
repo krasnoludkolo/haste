@@ -1,24 +1,24 @@
 package io.haste.event;
 
-import io.haste.TimeService;
+import io.haste.TimeSource;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 class Event{
 
-    private LocalDateTime eventTime;
-    private TimeService timeService;
+    private ZonedDateTime eventTime;
+    private TimeSource timeSource;
 
-    Event(LocalDateTime eventTime, TimeService timeService){
-        if(timeService.now().isAfter(eventTime)){
+    Event(ZonedDateTime eventTime, TimeSource timeSource) {
+        if (timeSource.now().isAfter(eventTime)) {
             throw new IllegalArgumentException("Cannot make event in past");
         }
         this.eventTime = eventTime;
-        this.timeService = timeService;
+        this.timeSource = timeSource;
     }
 
     boolean hasAlreadyBegun(){
-        return timeService.now().isAfter(eventTime);
+        return timeSource.now().isAfter(eventTime);
     }
 
 }

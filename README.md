@@ -1,5 +1,9 @@
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste/badge.png)](https://maven-badges.herokuapp.com/maven-central/io.github.krasnoludkolo/haste)
+[![Build Status](https://travis-ci.org/krasnoludkolo/haste.svg?branch=master)](https://travis-ci.org/krasnoludkolo/haste)
+[![codecov](https://codecov.io/gh/krasnoludkolo/haste/branch/master/graph/badge.svg)](https://codecov.io/gh/krasnoludkolo/haste)
+
 # haste
-A lightweight library for time management in java applications.
+A small library for testing time-related stuff
 
 ## Goals and motivation
 
@@ -15,136 +19,135 @@ Here comes the idea to create an open source library to help write tests
 <dependency>
     <groupId>io.github.krasnoludkolo</groupId>
     <artifactId>haste</artifactId>
-    <version>0.0.1</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 ```groovy
-compile 'io.github.krasnoludkolo:haste:0.0.1'
+compile 'io.github.krasnoludkolo:haste:0.3.0'
 ```
 
 
 ## Features
 
 ### TL;DR
-<i>Haste</i> provides the following `TimeService` interface
-```java
-public interface TimeService {
-    LocalDateTime now();
-    ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);
-}
-```
-which has two implementations:
-* <i>production</i>: based on system clock and default java `ScheduledExecutorService`
-* <i>test</i>: based on changeable clock and scheduler prepared for making 'time jumping' 
-
-It gives you more control over time during tests. 
-
+<i>Haste</i> provides:
+- the implementation of [ScheduledExecutorService](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ScheduledExecutorService.html)
+with ```advanceTimeBy``` method to simulate lapse of time.
+- the interface ```TimeSource``` to create abstraction over time
 ### Full version
 
-##### Time providing
-
-Consider a simple class:
-```java
-class Event{
-    private LocalDateTime eventTime;
-    
-    Event(LocalDateTime eventTime){
-        if(LocalDateTime.now().isAfter(eventTime)){
-            throw new IllegalArgumentException("Cannot make event in past");
-        }
-        this.eventTime = eventTime;
-    }
-    
-    boolean hasAlreadyBegun(){
-        return LocalDateTime.now().isAfter(eventTime);
-    }
-    
-}
-```
-
-So, how to test `hasAlreadyBegun()` method? You cannot simply create the object and call method because it requires future date.
- So you need to wait and finally check it which isn't really recommended for fast unit tests.
-You can provide current date as parameter but if your system has many layers it could be messy.
-
-Instead you can treat time as external dependency. 
-Let's modify the above class:
-```java
-class Event{
-    private LocalDateTime eventTime;
-    private TimeService timeService;
-    
-    Event(LocalDateTime eventTime, TimeService timeService){
-        if(timeService.now().isAfter(eventTime)){
-            throw new IllegalArgumentException("Cannot make event in past");
-        }
-        this.eventTime = eventTime;
-        this.timeService = timeService;
-    }
-    
-    boolean hasAlreadyBegun(){
-        return timeService.now().isAfter(matchStartDate);
-    }
-    
-}
-```
-So, now you can simply use the implementation of TimeService prepared for tests:
-```java
-public class EventTest{
-    
-    @Test
-    public void shouldEventStartsAfterStartDate(){
-        //given
-        TestTimeService timeService = TimeService.createTimeServiceForTestsWithCurrentTime();
-        LocalDateTime eventTime = LocalDateTime.now().plusHours(1);
-        Event event = new Event(eventTime,timeService);
-        //when
-        timeService.hackIntoFuture(2,TimeUnit.HOURS); //Probably temporally method name ;)
-        //then
-        assertTrue(event.hasAlreadyBegun());
-    }
-}
-```
-
-
-##### Test scheduled runnable
-Some actions in your system may also plan another actions to be done in thebo future. 
+##### Test scheduled tasks
+Some actions in your system may also plan another actions to be done in the future. 
 E.g. when you add a sport fixture you may want to check the result after it has finished
-When using normal java scheduler it is hard to test results of scheduled jobs without e.g. mocking. 
-Here comes the
-
-
-`ScheduledFuture schedule(Runnable runnable, long delay, TimeUnit timeUnit);`
- 
- method from `TimeService`. In 'production' implementation it acts like a normal java scheduler but in 'Test' 
- implementation you can (almost) instantly see the results of your actions. 
+When using normal java scheduler it is hard to scheduledExecutorServiceWithMovableTime results of scheduled jobs without e.g. mocking. 
+Here comes the implementation of ScheduledExecutorService with ```advanceTimeBy``` method.
  
  ```java
 class FooTest{
     
-    @Test
-    public void shouldExecuteAllScheduledJobs(){
-        Foo foo = new Foo(); // object with int value
-        FooAdd runnable = new FooAdd(foo); // add one to object value
-        Instant instant = Instant.ofEpochMilli(0);
-        ZoneId zoneId = ZoneId.systemDefault();
-        TestTimeService timeService = TimeService.createTimeServiceForTests(instant,zoneId);
-
-        ScheduledFuture schedule1 = timeService.schedule(runnable, 1, TimeUnit.HOURS);
-        ScheduledFuture schedule2 = timeService.schedule(runnable, 2, TimeUnit.HOURS);
-        ScheduledFuture schedule3 = timeService.schedule(runnable, 3, TimeUnit.HOURS);
-        ScheduledFuture schedule4 = timeService.schedule(runnable, 5, TimeUnit.HOURS);
-
-        timeService.hackIntoFuture(4,TimeUnit.HOURS); //Probably temporally method name ;)
-
-        assertEquals(3,foo.getA());
-        assertTrue(schedule1.isDone());
-        assertTrue(schedule2.isDone());
-        assertTrue(schedule3.isDone());
-        assertFalse(schedule4.isDone());
-    }
+        private static final Runnable EMPTY_RUNNABLE = () -> {};
+        private static final Callable<Integer> RETURN_ONE_CALLABLE = () -> 1;
+    
+        @Test
+        void shouldExecuteAllScheduledJobs() throws ExecutionException {
+            var executorService = Haste.ScheduledExecutionService.withFixedClockFromNow();
+    
+            var schedule1 = executorService.schedule(RETURN_ONE_CALLABLE, 1, TimeUnit.SECONDS);
+            var schedule2 = executorService.schedule(EMPTY_RUNNABLE, 2, TimeUnit.SECONDS);
+            var schedule3 = executorService.schedule(EMPTY_RUNNABLE, 3, TimeUnit.SECONDS);
+            var schedule4 = executorService.schedule(EMPTY_RUNNABLE, 5, TimeUnit.SECONDS);
+    
+            executorService.advanceTimeBy(4, TimeUnit.SECONDS);
+    
+            assertEquals(Integer.valueOf(1), schedule1.get()); //not null
+            
+            assertTrue(schedule1.isDone()); 
+            assertTrue(schedule2.isDone());
+            assertTrue(schedule3.isDone());
+            
+            assertFalse(schedule4.isDone());
+        }
 
 }
 ```
 
+##### Get access to current time
+With <i>Haste</i> comes the fallowing interface 
+```java
+public interface TimeSource {
+    ZonedDateTime now();
+    //and more version of "now"
+}
+```
+
+###### Standalone time source
+
+If you only need access to current time, without whole `ScheduledExecutionService` staff, you can use `MovableTimeSource` 
+which extends `TimeSource` interface. It simply works like in example
+
+```java
+class MovableTimeSourceTest {
+
+    @Test
+    void shouldNowReturnTimeWithOffset() {
+        Instant instant = Instant.ofEpochMilli(0);
+        ZoneId zoneId = ZoneId.systemDefault();
+        Clock clock = Clock.fixed(instant, zoneId);
+        MovableTimeSource timeSource = Haste.TimeSource.withFixedClock(clock);
+
+        timeSource.advanceTimeBy(1, TimeUnit.HOURS);
+
+        ZonedDateTime now = timeSource.now();
+
+        ZonedDateTime expected = ZonedDateTime.now(clock).plusHours(1);
+        assertEquals(expected, now);
+
+    }
+
+}
+
+```
+
+###### ScheduledExecutionService as time source
+```ScheduledExecutorServiceWithMovableTime``` from <i>Haste</i> implements that interface so you can obtain 'moved' 
+time like in example
+
+```java
+
+class Event{
+
+    private ZonedDateTime eventTime;
+    private TimeSource timeSource;
+
+    Event(ZonedDateTime eventTime, TimeSource timeSource) {
+        if (timeSource.now().isAfter(eventTime)) {
+            throw new IllegalArgumentException("Cannot make event in past");
+        }
+        this.eventTime = eventTime;
+        this.timeSource = timeSource;
+    }
+
+    boolean hasAlreadyBegun(){
+        return timeSource.now().isAfter(eventTime);
+    }
+
+}
+```
+```java
+
+class EventTest {
+
+    @Test
+    void shouldEventStartsAfterStartDate() {
+        BlockingScheduledExecutionService service = BlockingScheduledExecutionService.withFixedClockFromNow();
+        ZonedDateTime eventTime = ZonedDateTime.now().plusHours(1);
+        Event event = new Event(eventTime, service);
+        
+        service.advanceTimeBy(2, TimeUnit.HOURS);
+        
+        assertTrue(event.hasAlreadyBegun());
+    }
+}
+```
 ## Disclaimer
 Keep in mind that Haste is in early-alpha phase which means that some API details may change between versions.

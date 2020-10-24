@@ -1,20 +1,25 @@
 group 'io.github.krasnoludkolo'
-version '0.0.1'
+version '0.3.0'
 
 apply plugin: 'java'
 
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'jacoco'
 
-
-sourceCompatibility = 1.8
+sourceCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 task javadocJar(type: Jar) {
@@ -35,6 +40,7 @@ artifacts {
 }
 
 signing {
+    required { gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
@@ -42,13 +48,12 @@ uploadArchives {
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv('ossrhUsername'), password: project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv('ossrhPassword'))
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: project.hasProperty('ossrhUsername') ? project.property('ossrhUsername') : System.getenv('ossrhUsername'), password: project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : System.getenv('ossrhPassword'))
             }
 
             pom.project {
@@ -65,7 +70,7 @@ uploadArchives {
                         url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
-                
+
                 scm {
                     url 'scm:git@github.com:krasnoludkolo/haste.git'
                     connection 'scm:git@github.com:krasnoludkolo/haste.git'
@@ -82,3 +87,16 @@ uploadArchives {
         }
     }
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+check.dependsOn jacocoTestReport
