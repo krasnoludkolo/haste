@@ -51,7 +51,7 @@ class MovableTimeSourceTest {
         }
     }
 
-    // this test fails if system default timeZone is not Europe/Berlin
+    // this test was failing in version 0.3.0 if system default timeZone is not Europe/Berlin
     @Test
     void shouldPreserveTimeZoneWhileAdvancingTime() {
         Instant instant = Instant.parse("2020-10-24T22:22:03.00Z");
