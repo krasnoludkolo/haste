@@ -30,7 +30,7 @@ final class StandaloneMovableTimeSource implements MovableTimeSource {
     }
 
     public void advanceTimeBy(Duration duration) {
-        clock = Clock.fixed(Clock.offset(clock, duration).instant(), ZoneId.systemDefault());
+        clock = Clock.fixed(Clock.offset(clock, duration).instant(), clock.getZone());
     }
 
     @Override

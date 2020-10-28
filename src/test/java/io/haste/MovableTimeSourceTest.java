@@ -51,4 +51,19 @@ class MovableTimeSourceTest {
         }
     }
 
+    // this test was failing in version 0.3.0 if system default timeZone is not Europe/Berlin
+    @Test
+    void shouldPreserveTimeZoneWhileAdvancingTime() {
+        Instant instant = Instant.parse("2020-10-24T22:22:03.00Z");
+        ZoneId zoneId = ZoneId.of("Europe/Berlin");
+        Clock clock = Clock.fixed(instant, zoneId);
+        MovableTimeSource timeSource = Haste.TimeSource.withFixedClock(clock);
+
+        timeSource.advanceTimeBy(6, TimeUnit.HOURS);
+
+        var actual = timeSource.now().getZone().toString();
+
+        assertEquals("Europe/Berlin", actual);
+    }
+
 }
